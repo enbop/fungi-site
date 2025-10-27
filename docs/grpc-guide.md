@@ -61,6 +61,6 @@ grpcurl -proto fungi_daemon.proto -plaintext 127.0.0.1:5405 fungi_daemon.FungiDa
 Output:
 ```json
 {
-  "peerId": "16Uiu2HAkuvL7awV2aph1E6W5qnw5pntTA5tJ3ohkMYLWNu49Wkgz"
+  "peerId": "16Uiu2...."
 }
 ```
