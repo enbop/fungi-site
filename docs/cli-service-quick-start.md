@@ -276,3 +276,10 @@ shared_root_dir = "/tmp"  # Directory to share with remote devices
 Remote devices will be able to browse and access files in this directory.
 
 > **Note:** After editing the configuration file, you need to restart the daemon for changes to take effect. CLI commands like `./fungi ap add` take effect immediately without restarting.
+
+## Related Guides
+
+- [Connection Diagnostics](connection-diagnostics)
+- [gRPC Guide](grpc-guide)
+- [Self-hosted Relay](self-hosted-relay)
+- [Built-in WASI Support](wasi)

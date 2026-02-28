@@ -10,9 +10,54 @@
   overflow: hidden;
 }
 
+.heroBackdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.12), transparent 45%);
+  pointer-events: none;
+}
+
+.heroOrbOne,
+.heroOrbTwo {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.heroOrbOne {
+  width: 240px;
+  height: 240px;
+  top: -80px;
+  left: 8%;
+  animation: floatOrb 9s ease-in-out infinite;
+}
+
+.heroOrbTwo {
+  width: 180px;
+  height: 180px;
+  right: 10%;
+  bottom: -70px;
+  animation: floatOrb 7s ease-in-out infinite reverse;
+}
+
+.heroDescription {
+  margin: 0 auto 1.5rem;
+  max-width: 720px;
+  opacity: 0.95;
+}
+
 @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
+  }
+
+  .heroOrbOne,
+  .heroOrbTwo {
+    display: none;
   }
 }
 
@@ -20,4 +65,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+
+  50% {
+    transform: translateY(-10px) translateX(6px);
+  }
+
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .heroOrbOne,
+  .heroOrbTwo {
+    animation: none;
+  }
 }

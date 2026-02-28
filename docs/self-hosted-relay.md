@@ -2,6 +2,8 @@
 
 This guide shows you how to set up your own relay server using Fungi CLI for improved network connectivity.
 
+Need Fungi CLI binaries? Download from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+
 ## What is a Relay?
 
 Fungi CLI includes a built-in relay server functionality. A relay helps establish connections between peers that are behind NAT or firewalls, acting as an intermediary to facilitate peer-to-peer communication.

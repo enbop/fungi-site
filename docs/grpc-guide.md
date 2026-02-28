@@ -4,6 +4,8 @@ Both fungi-cli and fungi-app (GUI) communicate with the Fungi daemon through gRP
 
 You can also use any gRPC client to interact with the Fungi daemon.
 
+Need binaries first? Download Fungi CLI and Fungi App from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+
 ### gRPC Server Address
 By default, the Fungi daemon starts a gRPC server listening on `127.0.0.1:5405`.
 You can change the listening address in the configuration file `~/.fungi/config.toml`:

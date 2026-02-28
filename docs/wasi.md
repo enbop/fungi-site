@@ -7,6 +7,8 @@ Starting from version 0.4.0, Fungi CLI includes built-in support for running Web
 It re-exports commands from the [Wasmtime](https://github.com/bytecodealliance/wasmtime) project, allowing you to run WebAssembly modules with WASI support directly from the Fungi CLI.
 
 >**Recommended Reading:** If you're new to Fungi, we recommend reading the [CLI Service Quick Start](cli-service-quick-start) guide first to understand the basics of Fungi's networking and port forwarding.
+>
+>**Download:** Get Fungi CLI binaries from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
 
 ### Available WASI Commands
 
@@ -20,7 +22,7 @@ This example demonstrates how to run a WASI module on **Device A** and access it
 
 >**Prerequisites:**
 >- Both Device A and Device B have Fungi daemon installed and running
->- Device B is added to Device A's `incoming-allowed-peers` list
+>- Device B is added to Device A's incoming allowed peers list (for example via `fungi ap add`)
 >- For setup instructions, see the [CLI Service Quick Start](cli-service-quick-start) guide
 
 We'll use [spore-box](https://github.com/enbop/spore-box), a toy WASI application that allows you to transfer files and short messages between devices.
