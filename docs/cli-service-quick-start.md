@@ -13,11 +13,13 @@ Commands:
   daemon        Start a Fungi daemon
   relay         Start a simple Fungi relay server
   info          Show daemon information
-  allowed-peer  Manage incoming allowed peers [aliases: ap]
+  allowed-peers Manage incoming allowed peers [aliases: ap]
   ft-service    Manage file transfer service [aliases: fs]
   ft-client     Manage file transfer client config and FTP and WebDAV proxies [aliases: fc]
   tunnel        Manage TCP tunneling [aliases: tn]
   device        Device discovery and address book
+  connection    Connection observability and diagnostics [aliases: conn]
+  ping          Continuously ping all active connections to a peer
   run           [WASI runtime] Run a WebAssembly module (re-exported wasmtime command)
   serve         [WASI runtime] Serve wasi-http requests (re-exported wasmtime command)
   help          Print this message or the help of the given subcommand(s)
@@ -30,13 +32,14 @@ Options:
 
 ## Command Overview
 
-Fungi CLI commands can be divided into three main categories:
+Fungi CLI commands can be divided into four main categories:
 
 | Category | Commands | Notes |
 |----------|----------|-------|
 | **Core Daemon Commands** | `init`, `daemon`, `relay` | Initialize and start Fungi services |
 | **WASI Runtime Commands** | `run`, `serve` | Re-exported wasmtime commands for WebAssembly modules |
-| **Daemon Management Commands** | `info`, `allowed-peer` (`ap`), `ft-service` (`fs`), `ft-client` (`fc`), `tunnel` (`tn`), `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** | 
+| **Daemon Management Commands** | `info`, `allowed-peers` (`ap`), `ft-service` (`fs`), `ft-client` (`fc`), `tunnel` (`tn`), `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** |
+| **Connection Diagnostics Commands** | `connection` (`conn`), `ping` | Observe active connections/streams and continuously measure peer RTT. **Require `fungi daemon` to be running first.** |
 
 
 # Fungi Service Quick Start
@@ -89,7 +92,7 @@ Now you can configure your Fungi services while the daemon is running.
 Add the PeerID of devices you want to allow access to your current device:
 
 ```bash
-./fungi allowed-peer add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+./fungi allowed-peers add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 Or use the short alias:
@@ -165,6 +168,23 @@ To remove a listening rule:
 ```bash
 ./fungi tn remove-listen 127.0.0.1:22
 ```
+
+### Check Connection Health (Optional)
+
+Use connection diagnostics commands to inspect active links and stream activity:
+
+```bash
+./fungi conn overview
+./fungi conn streams
+```
+
+Continuously ping all active connections to a peer:
+
+```bash
+./fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --interval-ms 2000
+```
+
+Add `--verbose` to either command when you need full peer IDs and detailed addresses.
 
 ## Configuration File Reference
 
