@@ -53,20 +53,24 @@ This guide shows you how to quickly set up Fungi CLI for file sharing and port f
 
 ## Step 1: Initialize Configuration
 
-First, initialize the configuration file (use `-f` to specify a custom path if needed):
+First, initialize the configuration file (use `-f` to specify a custom path if needed; global options should be placed before the command):
 
 ```bash
 ./fungi init
+# custom config dir
+./fungi -f /path/to/fungi init
 ```
 
 This will create a configuration file at `~/.fungi/config.toml` and display the path in the output.
 
 ## Step 2: Start the Daemon
 
-Start the Fungi daemon (use `-f` to specify a custom config path if needed):
+Start the Fungi daemon (use `-f` to specify a custom config path if needed; place it before `daemon`):
 
 ```bash
 ./fungi daemon
+# custom config dir
+./fungi -f /path/to/fungi daemon
 ```
 
 Keep the daemon running in this terminal.

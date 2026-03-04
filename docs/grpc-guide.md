@@ -32,6 +32,12 @@ You can use any gRPC client to interact with the Fungi daemon. Here is an exampl
 
 Run the Fungi App GUI or use the CLI command `./fungi daemon` to start the Fungi daemon.
 
+If you use a custom config directory, pass `-f` before the command:
+
+```bash
+./fungi -f /path/to/fungi daemon
+```
+
 
 #### Download `fungi_daemon.proto`
 
