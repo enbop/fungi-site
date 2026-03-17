@@ -1,6 +1,14 @@
-# Fungi CLI
+---
+sidebar_position: 2
+---
 
-Fungi CLI is a powerful command-line tool for managing the Fungi daemon and multi-device integration platform.
+# Fungi CLI Quick Start
+
+This page keeps only the shortest path to get Fungi running.
+
+If you want to control a remote node and open its web service locally, go to [Remote Service Control](remote-service-control).
+
+If you are looking for legacy file transfer usage, see [Deprecated File Transfer](deprecated-file-transfer).
 
 ```bash
 $ ./fungi help
@@ -13,10 +21,14 @@ Commands:
   daemon        Start a Fungi daemon
   relay         Start a simple Fungi relay server
   info          Show daemon information
-  allowed-peers Manage incoming allowed peers [aliases: ap]
+  security      Manage runtime safety boundary settings and incoming peer allowlists [aliases: sec]
   ft-service    Manage file transfer service [aliases: fs]
   ft-client     Manage file transfer client config and FTP and WebDAV proxies [aliases: fc]
   tunnel        Manage TCP tunneling [aliases: tn]
+  service       Manage local runtime services from manifests or service handles [aliases: svc]
+  catalog       Browse published remote services
+  access        Manage local access entries for remote services
+  peer          Query and administer remote peers
   device        Device discovery and address book
   connection    Connection observability and diagnostics [aliases: conn]
   ping          Continuously ping all active connections to a peer
@@ -38,18 +50,14 @@ Fungi CLI commands can be divided into four main categories:
 |----------|----------|-------|
 | **Core Daemon Commands** | `init`, `daemon`, `relay` | Initialize and start Fungi services |
 | **WASI Runtime Commands** | `run`, `serve` | Re-exported wasmtime commands for WebAssembly modules |
-| **Daemon Management Commands** | `info`, `allowed-peers` (`ap`), `ft-service` (`fs`), `ft-client` (`fc`), `tunnel` (`tn`), `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** |
+| **Daemon Management Commands** | `info`, `security` (`sec`), `tunnel` (`tn`), `service` (`svc`), `catalog`, `access`, `peer`, `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** |
 | **Connection Diagnostics Commands** | `connection` (`conn`), `ping` | Observe active connections/streams and continuously measure peer RTT. **Require `fungi daemon` to be running first.** |
-
-
-# Fungi Service Quick Start
-
-This guide shows you how to quickly set up Fungi CLI for file sharing and port forwarding.
 
 ## Prerequisites
 
 1. Download and have Fungi CLI binary ready from [GitHub Releases](https://github.com/enbop/fungi/releases/latest)
-2. Know the PeerIDs of other devices that will connect to this device (you'll add these as allowed peers)
+2. Keep one terminal available for `fungi daemon`
+3. Know the PeerIDs of the devices you want to connect
 
 ## Step 1: Initialize Configuration
 
@@ -59,6 +67,8 @@ First, initialize the configuration file (use `-f` to specify a custom path if n
 ./fungi init
 # custom config dir
 ./fungi -f /path/to/fungi init
+# rewrite an existing config.toml using the current schema/default sections
+./fungi init --upgrade-config
 ```
 
 This will create a configuration file at `~/.fungi/config.toml` and display the path in the output.
@@ -85,158 +95,73 @@ Open a new terminal and get your device's PeerID:
 
 This will display your device's PeerID, which you can share with other devices that need to connect to you.
 
-## Step 4: Configure Services
+## Step 3.5: Name Remote Peers In The Address Book
+
+New user-facing peer workflows are alias-first. Before adding a peer to security policy or targeting it with remote commands, register it with a unique alias:
+
+```bash
+./fungi device add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --alias macbook
+./fungi device list
+./fungi peer use macbook
+./fungi peer current
+```
+
+After `peer use`, later `catalog`, `access`, and `peer admin` commands can omit `--peer`. The CLI prints the resolved target peer before each remote operation so you can see exactly which node it is using.
+
+## Step 4: Configure Trust And Start A Local Service
 
 Now you can configure your Fungi services while the daemon is running.
 
 ### Add Allowed Peers
 
-> **⚠️ Security Notice:** Only add PeerIDs of devices you trust. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
+> **⚠️ Security Notice:** Only add peers you trust. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
 
-Add the PeerID of devices you want to allow access to your current device:
+Add a named peer to the incoming allowlist:
 
 ```bash
-./fungi allowed-peers add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+./fungi security allowed-peers add macbook
 ```
 
-Or use the short alias:
+Or use the short top-level alias:
 
 ```bash
-./fungi ap add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+./fungi sec allowed-peers add macbook
 ```
 
 To view the current list of allowed peers:
 
 ```bash
-./fungi ap list
+./fungi sec allowed-peers list
 ```
 
-### Enable File Sharing
-
-> File Transfer and Port Forwarding are independent features. You can configure and use either one without the other based on your needs.
-
-
-If you want to share files, start the file transfer service with a shared directory:
+Pull and start a local service:
 
 ```bash
-./fungi ft-service start --root-dir /path/to/share
+./fungi service pull ./examples/service-manifests/filebrowser.service.yaml
+./fungi service start filebrowser
+./fungi service inspect filebrowser
 ```
 
-Or use the short alias:
+For a remote-node workflow built on `peer`, `catalog`, and `access`, continue with [Remote Service Control](remote-service-control).
 
-```bash
-./fungi fs start --root-dir /path/to/share
-```
+## Optional: Check Connection Health
 
-To check the file transfer service status:
-
-```bash
-./fungi fs status
-```
-
-To stop the file transfer service:
-
-```bash
-./fungi fs stop
-```
-
-### Enable Port Listening
-
-If you want to expose ports to remote devices, add TCP listening rules:
-
-```bash
-# Add a port to expose (e.g., SSH on port 22)
-./fungi tunnel add-listen 127.0.0.1:22
-```
-
-Or use the short alias:
-
-```bash
-./fungi tn add-listen 127.0.0.1:22
-```
-
-You can add multiple ports:
-
-```bash
-./fungi tn add-listen 127.0.0.1:8080  # Expose HTTP server
-```
-
-To view current tunneling configuration:
-
-```bash
-./fungi tn show
-```
-
-To remove a listening rule:
-
-```bash
-./fungi tn remove-listen 127.0.0.1:22
-```
-
-### Check Connection Health (Optional)
-
-Use connection diagnostics commands to inspect active links and stream activity:
+Use diagnostics when you want to verify active links and stream state:
 
 ```bash
 ./fungi conn overview
 ./fungi conn streams
-```
-
-Continuously ping all active connections to a peer:
-
-```bash
 ./fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --interval-ms 2000
 ```
 
-Add `--verbose` to either command when you need full peer IDs and detailed addresses.
+Add `--verbose` when you need full peer IDs and detailed addresses.
 
-## Configuration File Reference
+## Next Reading
 
-While the CLI commands above provide a convenient way to manage your Fungi daemon, you can also directly edit the configuration file at `~/.fungi/config.toml` for more advanced settings.
-
-### Configuration File Structure
-
-```toml
-[rpc]
-listen_address = "127.0.0.1:5405"
-
-[network]
-listen_tcp_port = 0
-listen_udp_port = 0
-incoming_allowed_peers = [
-	"16Uiu2****" # Add allowed PeerID
-]
-disable_relay = false # Set to true to disable relay, the daemon will run in your local network only [Default is false]
-custom_relay_addresses = []
-
-[tcp_tunneling.forwarding]
-enabled = false # Enable if you want to forward remote ports to this device
-rules = []
-
-[tcp_tunneling.listening]
-enabled = true
-rules = [
-	{ host = "127.0.0.1", port = 22 } # Port to expose to remote devices (e.g., SSH)
-]
-
-[file_transfer.server]
-enabled = true # Set to enable file server
-shared_root_dir = "/tmp" # Change to the directory you want to share
-
-# Below are optional configurations for file transfer client mode
-[file_transfer.proxy_ftp]
-enabled = false # Enable if you want to access files on remote devices via FTP
-host = "127.0.0.1"
-port = 2121
-
-[file_transfer.proxy_webdav]
-enabled = false # Enable if you want to access files on remote devices via WebDAV
-host = "127.0.0.1"
-port = 8181
-
-[file_transfer]
-client = [] # Add client config if you want to access files on remote devices
-```
+- [Remote Service Control](remote-service-control): use `peer`, `catalog`, and `access` to manage a remote node and open its web app locally.
+- [Services And Runtimes](service-manifests): service manifest structure and runtime details.
+- [Built-in WASI Support](wasi): run or serve WASI workloads.
+- [Deprecated File Transfer](deprecated-file-transfer): old FTP/WebDAV-based file sharing path.
 
 ### Key Configuration Sections
 
@@ -251,10 +176,9 @@ incoming_allowed_peers = [
 ]
 ```
 
-> **⚠️ Security Notice:** Only add PeerIDs of devices you trust. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
+> **⚠️ Security Notice:** Only add trusted peers here. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
 
-
-You can also manage this list using the `./fungi ap add` and `./fungi ap list` commands.
+You can also manage this list using `./fungi security allowed-peers add` and `./fungi security allowed-peers list`.
 
 #### Port Forwarding
 
@@ -279,7 +203,7 @@ shared_root_dir = "/tmp"  # Directory to share with remote devices
 
 Remote devices will be able to browse and access files in this directory.
 
-> **Note:** After editing the configuration file, you need to restart the daemon for changes to take effect. CLI commands like `./fungi ap add` take effect immediately without restarting.
+> **Note:** After editing the configuration file, you need to restart the daemon for changes to take effect. CLI commands like `./fungi sec allowed-peers add macbook` take effect immediately without restarting.
 
 ## Related Guides
 

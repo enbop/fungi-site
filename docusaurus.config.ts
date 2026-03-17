@@ -6,7 +6,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
   title: "Fungi",
-  tagline: "Turn multiple devices into one unified system.",
+  tagline: "Build a private P2P device network for capability-first services.",
   favicon: "img/favicon.ico",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
