@@ -16,7 +16,7 @@
   --ifm-background-color: #fffaf0;
   --ifm-navbar-background-color: rgba(255, 250, 240, 0.86);
   --ifm-font-family-base: "Avenir Next", "SF Pro Text", "Segoe UI", "Helvetica Neue", sans-serif;
-  --ifm-heading-font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --ifm-heading-font-family: "Avenir Next", "SF Pro Display", "SF Pro Text", "Segoe UI", "Helvetica Neue", sans-serif;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
@@ -62,5 +62,6 @@ h5,
 h6,
 .navbar__title,
 .hero__title {
+  font-family: var(--ifm-heading-font-family);
   font-weight: 700;
 }

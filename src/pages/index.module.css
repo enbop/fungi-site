@@ -244,7 +244,7 @@
 
 .sectionTitle {
   margin: 0;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-family: var(--ifm-heading-font-family);
   font-size: clamp(2rem, 4vw, 3rem);
   color: #223127;
   font-weight: 700;

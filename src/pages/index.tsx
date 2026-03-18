@@ -48,32 +48,32 @@ const heroSteps = [
     body: "Start the local daemon.",
   },
   {
-    label: "Connect",
-    command: "fungi ping <peer-id>",
-    body: "Verify the peer is reachable.",
+    label: "Trust",
+    command: "fungi security allowed-peers add <alias>",
+    body: "Allow only your own device.",
   },
   {
-    label: "Access",
+    label: "Open",
     command: "fungi access open --peer <peer-id> filebrowser-lite-wasi",
-    body: "Access the remote service locally.",
+    body: "Open a remote app locally.",
   },
 ];
 
 const docs = [
   {
-    title: "Quick Start",
-    href: "/docs/cli-service-quick-start",
-    body: "Initialize Fungi, trust peers, and start a local service with the shortest path.",
+    title: "3 Minutes: Build Your Private P2P Network",
+    href: "/docs/quick-start/private-p2p-network",
+    body: "Connect two of your own devices, trust them safely, and verify the link with ping.",
   },
   {
-    title: "Remote Service Control",
-    href: "/docs/remote-service-control",
-    body: "Learn the `service`, `catalog`, and `access` flow for controlling remote nodes and opening remote web apps locally.",
+    title: "3 Minutes: Run A Remote Sandbox App",
+    href: "/docs/quick-start/remote-sandbox-app",
+    body: "Start a sandboxed app on one device and open it locally from another device.",
   },
   {
-    title: "Services And Runtimes",
-    href: "/docs/service-manifests",
-    body: "Understand manifests, exposure rules, Docker-compatible runtimes, and WASI services.",
+    title: "Reference Docs",
+    href: "/docs/intro",
+    body: "Dive into manifests, remote control, diagnostics, gRPC, relay setup, and runtime details.",
   },
 ];
 
@@ -100,9 +100,9 @@ function HomepageHeader() {
             <div className={styles.buttons}>
               <Link
                 className={styles.primaryButton}
-                to="/docs/cli-service-quick-start"
+                to="/docs/quick-start/private-p2p-network"
               >
-                Get Started
+                Quick Start
               </Link>
               <Link
                 className={styles.secondaryButton}
@@ -189,7 +189,7 @@ export default function Home(): ReactNode {
             <div className={styles.sectionHeader}>
               <p className={styles.eyebrow}>Start Here</p>
               <Heading as="h2" className={styles.sectionTitle}>
-                Documentation paths by task
+                Beginner-first docs, then deeper references
               </Heading>
             </div>
             <div className={styles.cardGrid}>

@@ -6,9 +6,16 @@ sidebar_position: 1
 
 Fungi helps you build a private encrypted P2P device network, then run and consume capability-first services across that network.
 
-If you're new here, start with [CLI Service Quick Start](cli-service-quick-start).
+If you're new here, start with the 3-Minute quick starts instead of the full reference docs.
 
 Download the latest binaries from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+
+## Start Here First
+
+- [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network): connect two of your own devices and verify the link with `fungi ping`.
+- [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): start a sandboxed app on one device and open it locally from another device.
+
+After that, use the reference docs when you want the full model, more command coverage, or deeper troubleshooting.
 
 ## Core Concepts
 
@@ -26,26 +33,29 @@ Download the latest binaries from [GitHub Releases](https://github.com/enbop/fun
 
 ## Documentation Map
 
-- [CLI Service Quick Start](cli-service-quick-start): shortest path to init, trust, and start a local service.
-- [Services And Runtimes](service-manifests): service manifests, runtime model, and publish/access flow.
-- [Runtime Examples](runtime-examples): direct Docker and Wasmtime manifest downloads plus side-by-side runtime examples.
-- [Remote Service Control](remote-service-control): control a remote node, manage its services, and open its web app locally.
-- [Connection Diagnostics](connection-diagnostics): inspect active streams and continuously ping peers.
-- [gRPC Guide](grpc-guide): integrate your own scripts/tools with daemon APIs.
-- [Self-hosted Relay](self-hosted-relay): run your own relay infrastructure.
-- [Built-in WASI Support](wasi): run or serve WASI modules through Fungi CLI.
-- [Deprecated File Transfer](deprecated-file-transfer): legacy FTP/WebDAV workflow kept only for compatibility.
+- [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network): the shortest newcomer path to connect two devices.
+- [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): the shortest newcomer path to run a remote app and open it locally.
+- [CLI Service Quick Start](/docs/cli-service-quick-start): longer CLI setup flow for local init, trust, and service basics.
+- [Services And Runtimes](/docs/service-manifests): service manifests, runtime model, and publish/access flow.
+- [Runtime Examples](/docs/runtime-examples): direct Docker and Wasmtime manifest downloads plus side-by-side runtime examples.
+- [Remote Service Control](/docs/remote-service-control): control a remote node, manage its services, and open its web app locally.
+- [Connection Diagnostics](/docs/connection-diagnostics): inspect active streams and continuously ping peers.
+- [gRPC Guide](/docs/grpc-guide): integrate your own scripts/tools with daemon APIs.
+- [Self-hosted Relay](/docs/self-hosted-relay): run your own relay infrastructure.
+- [Built-in WASI Support](/docs/wasi): run or serve WASI modules through Fungi CLI.
+- [Deprecated File Transfer](/docs/deprecated-file-transfer): legacy FTP/WebDAV workflow kept only for compatibility.
 
 ## Recommended Reading Paths
 
 ### For CLI Users
 
-1. [CLI Service Quick Start](cli-service-quick-start)
-2. [Services And Runtimes](service-manifests)
-3. [Runtime Examples](runtime-examples)
-4. [Remote Service Control](remote-service-control)
-5. [Connection Diagnostics](connection-diagnostics)
-6. [Self-hosted Relay](self-hosted-relay)
+1. [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network)
+2. [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
+3. [CLI Service Quick Start](/docs/cli-service-quick-start)
+4. [Services And Runtimes](/docs/service-manifests)
+5. [Remote Service Control](/docs/remote-service-control)
+6. [Connection Diagnostics](/docs/connection-diagnostics)
+7. [Self-hosted Relay](/docs/self-hosted-relay)
 
 ### For Integrators
 
