@@ -5,7 +5,7 @@
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Runtime Examples | Fungi</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://fungi.rs/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://fungi.rs/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://fungi.rs/docs/runtime-examples"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Runtime Examples | Fungi"><meta data-rh="true" name="description" content="This page gives you one Docker example and one Wasmtime/WASI example, with direct manifest downloads."><meta data-rh="true" property="og:description" content="This page gives you one Docker example and one Wasmtime/WASI example, with direct manifest downloads."><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://fungi.rs/docs/runtime-examples"><link data-rh="true" rel="alternate" href="https://fungi.rs/docs/runtime-examples" hreflang="en"><link data-rh="true" rel="alternate" href="https://fungi.rs/docs/runtime-examples" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Runtime Examples","item":"https://fungi.rs/docs/runtime-examples"}]}</script><link rel="alternate" type="application/rss+xml" href="/blog/rss.xml" title="Fungi RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/blog/atom.xml" title="Fungi Atom Feed"><link rel="stylesheet" href="/assets/css/styles.8b14955c.css">
-<script src="/assets/js/runtime~main.a9b1ad2b.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.b375ee73.js" defer="defer"></script>
 <script src="/assets/js/main.f33981f0.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -18,8 +18,8 @@
 <p>I am keeping both runtimes on the same page because most of the setup and mental model is shared. Splitting them into two pages would duplicate the important parts: what <code>fungi daemon</code> provides, how runtime detection works, and how service manifests are consumed.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="download-the-example-manifests">Download The Example Manifests<a href="#download-the-example-manifests" class="hash-link" aria-label="Direct link to Download The Example Manifests" title="Direct link to Download The Example Manifests">​</a></h2>
 <ul>
-<li><a href="/assets/files/filebrowser.service-99c3cf0301c2c8f280a22b30b4faecde.yaml" target="_blank">Download Docker manifest</a></li>
-<li><a href="/assets/files/filebrowser-lite-wasi.service-de42c4bc7b602cf5f067ce2a50150477.yaml" target="_blank">Download Wasmtime manifest</a></li>
+<li><a href="/assets/files/filebrowser.service-a693ba1ddd0435406ea6ecd43f47eef8.yaml" target="_blank">Download Docker manifest</a></li>
+<li><a href="/assets/files/filebrowser-lite-wasi.service-3e17945722afcd2428b14bdbbe3f1303.yaml" target="_blank">Download Wasmtime manifest</a></li>
 </ul>
 <p>If you want version-locked artifacts in the future, GitHub Releases is the better long-term place. That would need CI changes so each release publishes the matching manifests as release assets. For now, site-hosted static downloads are the simplest stable path.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-the-runtime-model-works">How The Runtime Model Works<a href="#how-the-runtime-model-works" class="hash-link" aria-label="Direct link to How The Runtime Model Works" title="Direct link to How The Runtime Model Works">​</a></h2>
@@ -51,7 +51,7 @@
 <p>Use this when the target machine has a Docker-compatible runtime available.</p>
 <p>Manifest download:</p>
 <ul>
-<li><a href="/assets/files/filebrowser.service-99c3cf0301c2c8f280a22b30b4faecde.yaml" target="_blank">filebrowser.service.yaml</a></li>
+<li><a href="/assets/files/filebrowser.service-a693ba1ddd0435406ea6ecd43f47eef8.yaml" target="_blank">filebrowser.service.yaml</a></li>
 </ul>
 <p>What it demonstrates:</p>
 <ul>
@@ -68,7 +68,7 @@
 <p>Use this when you want a service delivered as a WebAssembly module.</p>
 <p>Manifest download:</p>
 <ul>
-<li><a href="/assets/files/filebrowser-lite-wasi.service-de42c4bc7b602cf5f067ce2a50150477.yaml" target="_blank">filebrowser-lite-wasi.service.yaml</a></li>
+<li><a href="/assets/files/filebrowser-lite-wasi.service-3e17945722afcd2428b14bdbbe3f1303.yaml" target="_blank">filebrowser-lite-wasi.service.yaml</a></li>
 </ul>
 <p>What it demonstrates:</p>
 <ul>
