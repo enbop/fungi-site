@@ -88,6 +88,8 @@ What happens:
 
 Done.
 
+![service.gif](/img/service.gif)
+
 The app runs on `home-pc`, but you use it from `my-laptop` through the encrypted Fungi connection. 
 
 ## What Just Ran On `home-pc`

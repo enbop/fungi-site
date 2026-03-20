@@ -8,6 +8,8 @@ slug: /quick-start/private-p2p-network
 
 This guide shows the shortest beginner-friendly path to connect two of your own devices with Fungi.
 
+![ping.gif](/img/ping.gif)
+
 You will:
 
 - start the Fungi daemon on both devices
