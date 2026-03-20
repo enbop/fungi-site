@@ -30,7 +30,7 @@ In this example, assume your two devices are named `my-laptop` and `home-pc`.
 Run this command on both devices:
 
 ```bash
-./fungi daemon
+fungi daemon
 ```
 
 You will see startup logs similar to this:
@@ -50,7 +50,7 @@ Keep `fungi daemon` running on both devices.
 In another terminal, you can print the current device's PeerID:
 
 ```bash
-./fungi info id
+fungi info id
 ```
 
 
@@ -59,7 +59,7 @@ In another terminal, you can print the current device's PeerID:
 On `home-pc`, try local discovery first:
 
 ```bash
-./fungi device mdns
+fungi device mdns
 ```
 
 If both devices are on the same LAN, you may see output like this:
@@ -68,14 +68,14 @@ If both devices are on the same LAN, you may see output like this:
 16Uiu2H........Co7Cw9 -  (macbook-pro)
 ```
 
-If mDNS does not find the other device, copy the PeerID manually from `./fungi info id` on `my-laptop`.
+If mDNS does not find the other device, copy the PeerID manually from `fungi info id` on `my-laptop`.
 
 >The name in parentheses [`(macbook-pro)`] is the discovered device hostname, not your local Fungi alias.
 
 Now save that PeerID in the address book on `home-pc`:
 
 ```bash
-./fungi device add --alias my-laptop 16Uiu2H........Co7Cw9
+fungi device add --alias my-laptop 16Uiu2H........Co7Cw9
 ```
 
 >`alias` and hostname are different:
@@ -87,7 +87,7 @@ Now save that PeerID in the address book on `home-pc`:
 To verify the saved entry:
 
 ```bash
-./fungi device list
+fungi device list
 ```
 
 ## Step 3: Allow `my-laptop` To Access `home-pc`
@@ -95,7 +95,7 @@ To verify the saved entry:
 On `home-pc`, allow inbound access from `my-laptop`:
 
 ```bash
-./fungi security allowed-peers add my-laptop
+fungi security allowed-peers add my-laptop
 ```
 
 Fungi will show a confirmation screen before it updates the allowlist.
@@ -125,8 +125,8 @@ Important:
 
 > The `alias` can be used here, but a raw `PeerID` also works. For example, both of these are valid:
 >```bash
->./fungi security allowed-peers add my-laptop
->./fungi security allowed-peers add 16Uiu2H........Co7Cw9
+>fungi security allowed-peers add my-laptop
+>fungi security allowed-peers add 16Uiu2H........Co7Cw9
 >```
 
 ## Step 4: Add `home-pc` To `my-laptop`'s Address Book
@@ -136,7 +136,7 @@ Go back to `my-laptop`.
 Find `home-pc` with mDNS:
 
 ```bash
-./fungi device mdns
+fungi device mdns
 ```
 
 Example output:
@@ -148,7 +148,7 @@ Example output:
 Then save it locally:
 
 ```bash
-./fungi device add --alias home-pc 16Uiu2H........ZC3bdZ
+fungi device add --alias home-pc 16Uiu2H........ZC3bdZ
 ```
 
 ## Step 5: Ping `home-pc` From `my-laptop`
@@ -156,7 +156,7 @@ Then save it locally:
 On `my-laptop`, run:
 
 ```bash
-./fungi ping home-pc
+fungi ping home-pc
 ```
 
 Expected output looks like this:
@@ -184,7 +184,7 @@ That is why the reverse direction will fail:
 
 on `home-pc`:
 ```bash
-./fungi ping my-laptop
+fungi ping my-laptop
 ```
 ```text
 TICK   CONN   DIR      RLY   RTT        ADDR/MSG

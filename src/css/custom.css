@@ -153,4 +153,8 @@ h6,
   .navbar-sidebar__item.menu a {
     pointer-events: auto;
   }
+
+  html.docs-doc-page .navbar-sidebar__item.menu:first-of-type {
+    display: none;
+  }
 }

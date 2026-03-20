@@ -11,7 +11,7 @@ This guide starts where the [previous quick start](/docs/quick-start/private-p2p
 Now you can already ping `home-pc` from `my-laptop` by alias:
 
 ```bash
-./fungi ping home-pc
+fungi ping home-pc
 ```
 
 ```text
@@ -60,12 +60,12 @@ curl -L -O https://fungi.rs/downloads/manifests/filebrowser-lite-wasi.service.ya
 Tell the CLI that the current remote target is `home-pc`:
 
 ```bash
-./fungi peer use home-pc
+fungi peer use home-pc
 ```
 
 Show the current peer context to verify:
 ```bash
-./fungi peer current
+fungi peer current
 ```
 
 After this, later remote commands can omit `--peer home-pc`.
@@ -75,9 +75,9 @@ After this, later remote commands can omit `--peer home-pc`.
 Run these three commands on `my-laptop`:
 
 ```bash
-./fungi peer admin service pull ./filebrowser-lite-wasi.service.yaml
-./fungi peer admin service start filebrowser-lite-wasi
-./fungi access open filebrowser-lite-wasi
+fungi peer admin service pull ./filebrowser-lite-wasi.service.yaml
+fungi peer admin service start filebrowser-lite-wasi
+fungi access open filebrowser-lite-wasi
 ```
 
 What happens:
@@ -105,12 +105,12 @@ That means:
 If you want to see what is happening under the hood, these commands are the most useful:
 
 ```bash
-./fungi peer capability
-./fungi peer admin service list
-./fungi peer admin service inspect filebrowser-lite-wasi
-./fungi catalog list
-./fungi catalog inspect filebrowser-lite-wasi
-./fungi access list
+fungi peer capability
+fungi peer admin service list
+fungi peer admin service inspect filebrowser-lite-wasi
+fungi catalog list
+fungi catalog inspect filebrowser-lite-wasi
+fungi access list
 ```
 
 Use them like this:
@@ -122,7 +122,7 @@ Use them like this:
 
 ## Optional: Try The Docker Runtime
 
-If you run `./fungi peer capability`, you may also see Docker support on the remote node.
+If you run `fungi peer capability`, you may also see Docker support on the remote node.
 
 When Docker is available on `home-pc`, Fungi detects it automatically and manages it through a dedicated agent layer.
 
@@ -147,9 +147,9 @@ curl -L -O https://fungi.rs/downloads/manifests/filebrowser.service.yaml
 Then use the same three-step flow:
 
 ```bash
-./fungi peer admin service pull ./filebrowser.service.yaml
-./fungi peer admin service start filebrowser
-./fungi access open filebrowser
+fungi peer admin service pull ./filebrowser.service.yaml
+fungi peer admin service start filebrowser
+fungi access open filebrowser
 ```
 
 That is the Docker-backed version of the same remote app experience.

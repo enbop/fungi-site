@@ -13,21 +13,21 @@ This page remains only as a basic reference for existing FTP and WebDAV users.
 Expose a local directory:
 
 ```bash
-./fungi ft-service start --root-dir /path/to/share
-./fungi ft-service status
+fungi ft-service start --root-dir /path/to/share
+fungi ft-service status
 ```
 
 Short alias form:
 
 ```bash
-./fungi fs start --root-dir /path/to/share
-./fungi fs status
+fungi fs start --root-dir /path/to/share
+fungi fs status
 ```
 
 Stop the service:
 
 ```bash
-./fungi fs stop
+fungi fs stop
 ```
 
 ## Allow Trusted Peers
@@ -35,9 +35,9 @@ Stop the service:
 The remote device still needs to be added to your allowlist:
 
 ```bash
-./fungi device add <peer-id> --alias laptop
-./fungi security allowed-peers add laptop
-./fungi security allowed-peers list
+fungi device add <peer-id> --alias laptop
+fungi security allowed-peers add laptop
+fungi security allowed-peers list
 ```
 
 ## Configuration Notes

@@ -45,10 +45,10 @@ In both cases, the manifest declares:
 Both examples fit the same remote control model:
 
 ```bash
-./fungi peer admin service pull --peer <peer-id> <manifest.yaml>
-./fungi peer admin service start --peer <peer-id> <service-name>
-./fungi catalog list --peer <peer-id>
-./fungi access open --peer <peer-id> <service-id>
+fungi peer admin service pull --peer <peer-id> <manifest.yaml>
+fungi peer admin service start --peer <peer-id> <service-name>
+fungi catalog list --peer <peer-id>
+fungi access open --peer <peer-id> <service-id>
 ```
 
 That shared flow is why one page works better than two. The runtime changes, but the user-facing control path stays almost the same.
@@ -71,10 +71,10 @@ What it demonstrates:
 Pull and start it on a remote peer:
 
 ```bash
-./fungi peer admin service pull --peer <peer-id> ./filebrowser.service.yaml
-./fungi peer admin service start --peer <peer-id> filebrowser
-./fungi catalog inspect --peer <peer-id> filebrowser
-./fungi access open --peer <peer-id> filebrowser
+fungi peer admin service pull --peer <peer-id> ./filebrowser.service.yaml
+fungi peer admin service start --peer <peer-id> filebrowser
+fungi catalog inspect --peer <peer-id> filebrowser
+fungi access open --peer <peer-id> filebrowser
 ```
 
 Key point:
@@ -99,10 +99,10 @@ What it demonstrates:
 Pull and start it on a remote peer:
 
 ```bash
-./fungi peer admin service pull --peer <peer-id> ./filebrowser-lite-wasi.service.yaml
-./fungi peer admin service start --peer <peer-id> filebrowser-lite-wasi
-./fungi catalog inspect --peer <peer-id> filebrowser-lite-wasi
-./fungi access open --peer <peer-id> filebrowser-lite-wasi
+fungi peer admin service pull --peer <peer-id> ./filebrowser-lite-wasi.service.yaml
+fungi peer admin service start --peer <peer-id> filebrowser-lite-wasi
+fungi catalog inspect --peer <peer-id> filebrowser-lite-wasi
+fungi access open --peer <peer-id> filebrowser-lite-wasi
 ```
 
 Key point:

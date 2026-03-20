@@ -12,7 +12,7 @@ If you are new to Fungi, start with the quick starts first:
 - [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
 
 ```bash
-$ ./fungi help
+$ fungi help
 A platform built for seamless multi-device integration
 
 Usage: fungi [OPTIONS] <COMMAND>
@@ -65,11 +65,11 @@ Fungi CLI commands can be divided into four main categories:
 First, initialize the configuration file (use `-f` to specify a custom path if needed; global options should be placed before the command):
 
 ```bash
-./fungi init
+fungi init
 # custom config dir
-./fungi -f /path/to/fungi init
+fungi -f /path/to/fungi init
 # rewrite an existing config.toml using the current schema/default sections
-./fungi init --upgrade-config
+fungi init --upgrade-config
 ```
 
 This will create a configuration file at `~/.fungi/config.toml` and display the path in the output.
@@ -79,9 +79,9 @@ This will create a configuration file at `~/.fungi/config.toml` and display the 
 Start the Fungi daemon (use `-f` to specify a custom config path if needed; place it before `daemon`):
 
 ```bash
-./fungi daemon
+fungi daemon
 # custom config dir
-./fungi -f /path/to/fungi daemon
+fungi -f /path/to/fungi daemon
 ```
 
 Keep the daemon running in this terminal.
@@ -91,7 +91,7 @@ Keep the daemon running in this terminal.
 Open a new terminal and get your device's PeerID:
 
 ```bash
-./fungi info id
+fungi info id
 ```
 
 This will display your device's PeerID, which you can share with other devices that need to connect to you.
@@ -101,10 +101,10 @@ This will display your device's PeerID, which you can share with other devices t
 New user-facing peer workflows are alias-first. Before adding a peer to security policy or targeting it with remote commands, register it with a unique alias:
 
 ```bash
-./fungi device add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --alias macbook
-./fungi device list
-./fungi peer use macbook
-./fungi peer current
+fungi device add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --alias macbook
+fungi device list
+fungi peer use macbook
+fungi peer current
 ```
 
 After `peer use`, later `catalog`, `access`, and `peer admin` commands can omit `--peer`. The CLI prints the resolved target peer before each remote operation so you can see exactly which node it is using.
@@ -120,27 +120,27 @@ Now you can configure your Fungi services while the daemon is running.
 Add a named peer to the incoming allowlist:
 
 ```bash
-./fungi security allowed-peers add macbook
+fungi security allowed-peers add macbook
 ```
 
 Or use the short top-level alias:
 
 ```bash
-./fungi sec allowed-peers add macbook
+fungi sec allowed-peers add macbook
 ```
 
 To view the current list of allowed peers:
 
 ```bash
-./fungi sec allowed-peers list
+fungi sec allowed-peers list
 ```
 
 Pull and start a local service:
 
 ```bash
-./fungi service pull ./examples/service-manifests/filebrowser.service.yaml
-./fungi service start filebrowser
-./fungi service inspect filebrowser
+fungi service pull ./examples/service-manifests/filebrowser.service.yaml
+fungi service start filebrowser
+fungi service inspect filebrowser
 ```
 
 For a remote-node workflow built on `peer`, `catalog`, and `access`, continue with [Remote Service Control](remote-service-control).
@@ -150,9 +150,9 @@ For a remote-node workflow built on `peer`, `catalog`, and `access`, continue wi
 Use diagnostics when you want to verify active links and stream state:
 
 ```bash
-./fungi conn overview
-./fungi conn streams
-./fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --interval-ms 2000
+fungi conn overview
+fungi conn streams
+fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --interval-ms 2000
 ```
 
 Add `--verbose` when you need full peer IDs and detailed addresses.
@@ -179,7 +179,7 @@ incoming_allowed_peers = [
 
 > **⚠️ Security Notice:** Only add trusted peers here. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
 
-You can also manage this list using `./fungi security allowed-peers add` and `./fungi security allowed-peers list`.
+You can also manage this list using `fungi security allowed-peers add` and `fungi security allowed-peers list`.
 
 #### Port Forwarding
 
@@ -204,7 +204,7 @@ shared_root_dir = "/tmp"  # Directory to share with remote devices
 
 Remote devices will be able to browse and access files in this directory.
 
-> **Note:** After editing the configuration file, you need to restart the daemon for changes to take effect. CLI commands like `./fungi sec allowed-peers add macbook` take effect immediately without restarting.
+> **Note:** After editing the configuration file, you need to restart the daemon for changes to take effect. CLI commands like `fungi sec allowed-peers add macbook` take effect immediately without restarting.
 
 ## Related Guides
 
