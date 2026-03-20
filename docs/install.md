@@ -83,11 +83,24 @@ systemctl --user daemon-reload
 systemctl --user enable fungi.service
 ```
 
-Useful commands:
+Common commands:
+
+```bash
+systemctl --user start fungi.service
+systemctl --user enable fungi.service
+sudo loginctl enable-linger <user>
+```
+
+Meaning:
+
+- `systemctl --user start fungi.service`: start the daemon in the background now
+- `systemctl --user enable fungi.service`: start it automatically when your user logs in
+- `sudo loginctl enable-linger <user>`: keep the user service available after a real reboot, even before login
+
+More useful commands:
 
 ```bash
 systemctl --user status fungi.service
-systemctl --user start fungi.service
 systemctl --user restart fungi.service
 journalctl --user -u fungi.service -f
 ```

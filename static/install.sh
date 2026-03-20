@@ -143,6 +143,22 @@ print_path_hint() {
   esac
 }
 
+print_linux_service_hint() {
+  case "$PLATFORM" in
+    linux-x86_64|linux-aarch64) ;;
+    *) return 0 ;;
+  esac
+
+  say ""
+  say "Linux service commands:"
+  say "  Start the daemon in the background now:"
+  say "    systemctl --user start fungi.service"
+  say "  Start it automatically when your user logs in:"
+  say "    systemctl --user enable fungi.service"
+  say "  Keep it available after a real reboot before login:"
+  say "    sudo loginctl enable-linger \"$USER\""
+}
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --version)
@@ -210,5 +226,10 @@ fi
 install_systemd_user_service
 
 INSTALLED_VERSION=$($TARGET_PATH --version 2>/dev/null || printf 'fungi <unknown version>')
-say "$INSTALLED_VERSION"
+say "Installed Fungi successfully."
+say "  Binary: $TARGET_PATH"
+say "  Version: $INSTALLED_VERSION"
+say ""
+say "If your current shell does not find 'fungi' immediately, run 'hash -r' or restart the shell."
 print_path_hint
+print_linux_service_hint
