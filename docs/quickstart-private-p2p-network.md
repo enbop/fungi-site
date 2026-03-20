@@ -15,12 +15,7 @@ You will:
 - allow inbound access only for your own device
 - verify the connection with `fungi ping`
 
-In this example:
-
-- Device A: `laptop-A`
-- Device B: `pc-B`
-
-If you want the longer CLI walkthrough, see [Fungi CLI Quick Start](/docs/cli-service-quick-start). If you want to run an app after the devices can talk to each other, continue with [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app).
+In this example, assume your two devices are named `my-laptop` and `home-pc`.
 
 ## Before You Start
 
@@ -59,9 +54,9 @@ In another terminal, you can print the current device's PeerID:
 ```
 
 
-## Step 2: Add `Device A` To `Device B`'s Address Book
+## Step 2: Add `my-laptop` To `home-pc`'s Address Book
 
-On `pc-B`, try local discovery first:
+On `home-pc`, try local discovery first:
 
 ```bash
 ./fungi device mdns
@@ -70,18 +65,24 @@ On `pc-B`, try local discovery first:
 If both devices are on the same LAN, you may see output like this:
 
 ```text
-16Uiu2H........Co7Cw9 -  (laptop-A)
+16Uiu2H........Co7Cw9 -  (macbook-pro)
 ```
 
-If mDNS does not find the other device, copy the PeerID manually from `./fungi info id` on `laptop-A`.
+If mDNS does not find the other device, copy the PeerID manually from `./fungi info id` on `my-laptop`.
 
-Now save that PeerID in the address book on `pc-B`:
+>The name in parentheses [`(macbook-pro)`] is the discovered device hostname, not your local Fungi alias.
+
+Now save that PeerID in the address book on `home-pc`:
 
 ```bash
-./fungi device add --alias laptop-A 16Uiu2H........Co7Cw9
+./fungi device add --alias my-laptop 16Uiu2H........Co7Cw9
 ```
 
-You can use any `alias` you want. The `alias` is only a local nickname.
+>`alias` and hostname are different:
+>- the hostname comes from the remote device and usually looks like a system name such as `macbook-pro`
+>- the `alias` is the name you choose locally for that peer, such as `my-laptop`
+>- different devices can show similar or changing hostnames, but your `alias` is the stable name you use in Fungi commands
+>- in this guide, you will mainly use the `alias`
 
 To verify the saved entry:
 
@@ -89,12 +90,12 @@ To verify the saved entry:
 ./fungi device list
 ```
 
-## Step 3: Allow `Device A` To Access `Device B`
+## Step 3: Allow `my-laptop` To Access `home-pc`
 
-On `pc-B`, allow inbound access from `laptop-A`:
+On `home-pc`, allow inbound access from `my-laptop`:
 
 ```bash
-./fungi security allowed-peers add laptop-A
+./fungi security allowed-peers add my-laptop
 ```
 
 Fungi will show a confirmation screen before it updates the allowlist.
@@ -102,7 +103,7 @@ Fungi will show a confirmation screen before it updates the allowlist.
 ```text
 ================ SECURITY CONFIRMATION ================
 You are about to trust this peer for incoming access:
-  Peer: laptop-A
+  Peer: my-laptop
   Peer ID: 16Uiu2H........Co7Cw9
 
 This peer will be able to:
@@ -123,17 +124,16 @@ Important:
 - **never add an unknown PeerID**
 
 > The `alias` can be used here, but a raw `PeerID` also works. For example, both of these are valid:
+>```bash
+>./fungi security allowed-peers add my-laptop
+>./fungi security allowed-peers add 16Uiu2H........Co7Cw9
+>```
 
-```bash
-./fungi security allowed-peers add laptop-A
-./fungi security allowed-peers add 16Uiu2H........Co7Cw9
-```
+## Step 4: Add `home-pc` To `my-laptop`'s Address Book
 
-## Step 4: Add `Device B` To `Device A`'s Address Book
+Go back to `my-laptop`.
 
-Go back to `laptop-A`.
-
-Find `pc-B` with mDNS:
+Find `home-pc` with mDNS:
 
 ```bash
 ./fungi device mdns
@@ -142,27 +142,27 @@ Find `pc-B` with mDNS:
 Example output:
 
 ```text
-16Uiu2H........ZC3bdZ -  (pc-B)
+16Uiu2H........ZC3bdZ -  (workstation-b)
 ```
 
 Then save it locally:
 
 ```bash
-./fungi device add --alias pc-B 16Uiu2H........ZC3bdZ
+./fungi device add --alias home-pc 16Uiu2H........ZC3bdZ
 ```
 
-## Step 5: Ping `Device B` From `Device A`
+## Step 5: Ping `home-pc` From `my-laptop`
 
-On `laptop-A`, run:
+On `my-laptop`, run:
 
 ```bash
-./fungi ping pc-B
+./fungi ping home-pc
 ```
 
 Expected output looks like this:
 
 ```text
-Target peer: pc-B(16Uiu2H........ZC3bdZ)
+Target peer: home-pc(16Uiu2H........ZC3bdZ)
 Ping stream peer=16Uiu2H........ZC3bdZ interval=2000ms (Ctrl+C to stop)
 TICK   CONN   DIR      RLY   RTT        ADDR/MSG
 0      -      -        -     -          connecting
@@ -176,18 +176,16 @@ If you see round-trip time values such as `5ms` or `6ms`, the secure P2P link is
 
 You created a one-way trust relationship:
 
-- `pc-B` allows inbound access from `laptop-A`
-- `laptop-A` can now open a connection to `pc-B`
-- `pc-B` still cannot control `laptop-A` unless you explicitly allow it too
+- `home-pc` allows inbound access from `my-laptop`
+- `my-laptop` can now open a connection to `home-pc`
+- `home-pc` still cannot control `my-laptop` unless you explicitly allow it too
 
-That is why the reverse direction may still fail:
+That is why the reverse direction will fail:
 
+on `home-pc`:
 ```bash
-./fungi ping laptop-A
+./fungi ping my-laptop
 ```
-
-Possible output on `pc-B`:
-
 ```text
 TICK   CONN   DIR      RLY   RTT        ADDR/MSG
 0      -      -        -     -          connecting
@@ -199,10 +197,11 @@ This is expected. Fungi does not automatically create mutual trust.
 
 ## Next Step
 
-Now that the two devices can talk to each other, continue with [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app).
+Continue with [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app).
 
 If you want more detail before that, see:
 
+- [Fungi CLI Guide](/docs/cli-service-quick-start)
 - [Connection Diagnostics](/docs/connection-diagnostics)
 - [Remote Service Control](/docs/remote-service-control)
 - [Services And Runtimes](/docs/service-manifests)

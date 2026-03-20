@@ -6,20 +6,16 @@ sidebar_position: 1
 
 Fungi helps you build a private encrypted P2P device network, then run and consume capability-first services across that network.
 
-If you're new here, start with the 3-Minute quick starts instead of the full reference docs.
-
 Download the latest binaries from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
 
 ## Start Here First
 
 - [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network): connect two of your own devices and verify the link with `fungi ping`.
-- [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): start a sandboxed app on one device and open it locally from another device.
-
-After that, use the reference docs when you want the full model, more command coverage, or deeper troubleshooting.
+- [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): start a sandboxed app on one device and open it locally from another device.
 
 ## Core Concepts
 
-- **Daemon-first architecture**: `fungi daemon` runs networking, discovery, relay fallback, and service state.
+- **Daemon architecture**: `fungi daemon` runs networking, discovery, relay fallback, and service state.
 - **Multiple control clients**: Fungi CLI, Fungi App, and any gRPC client all control the same daemon API.
 - **PeerID-based trust**: inbound access is controlled by allowed peers.
 - **Capability-first services**: publish container or WASI workloads according to explicit runtime and network policy.
@@ -34,8 +30,8 @@ After that, use the reference docs when you want the full model, more command co
 ## Documentation Map
 
 - [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network): the shortest newcomer path to connect two devices.
-- [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): the shortest newcomer path to run a remote app and open it locally.
-- [CLI Service Quick Start](/docs/cli-service-quick-start): longer CLI setup flow for local init, trust, and service basics.
+- [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): the shortest newcomer path to run a remote app and open it locally.
+- [Fungi CLI Guide](/docs/cli-service-quick-start): detailed CLI setup flow for local init, trust, peer context, and service basics.
 - [Services And Runtimes](/docs/service-manifests): service manifests, runtime model, and publish/access flow.
 - [Runtime Examples](/docs/runtime-examples): direct Docker and Wasmtime manifest downloads plus side-by-side runtime examples.
 - [Remote Service Control](/docs/remote-service-control): control a remote node, manage its services, and open its web app locally.
@@ -50,8 +46,8 @@ After that, use the reference docs when you want the full model, more command co
 ### For CLI Users
 
 1. [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network)
-2. [3-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
-3. [CLI Service Quick Start](/docs/cli-service-quick-start)
+2. [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
+3. [Fungi CLI Guide](/docs/cli-service-quick-start)
 4. [Services And Runtimes](/docs/service-manifests)
 5. [Remote Service Control](/docs/remote-service-control)
 6. [Connection Diagnostics](/docs/connection-diagnostics)
@@ -62,11 +58,11 @@ After that, use the reference docs when you want the full model, more command co
 1. [gRPC Guide](grpc-guide)
 2. [Services And Runtimes](service-manifests)
 3. [Remote Service Control](remote-service-control)
-4. [CLI Service Quick Start](cli-service-quick-start)
+4. [Fungi CLI Guide](cli-service-quick-start)
 
 ### For Experimental WASI Workloads
 
-1. [CLI Service Quick Start](cli-service-quick-start)
+1. [Fungi CLI Guide](cli-service-quick-start)
 2. [Services And Runtimes](service-manifests)
 3. [Runtime Examples](runtime-examples)
 4. [Built-in WASI Support](wasi)

@@ -1,14 +1,15 @@
 ---
+title: Fungi CLI Guide
+description: Detailed guide to the Fungi CLI commands, daemon workflow, peer context, and service basics.
 sidebar_position: 2
 ---
 
-# Fungi CLI Quick Start
+# Fungi CLI Guide
 
-This page keeps only the shortest path to get Fungi running.
+If you are new to Fungi, start with the quick starts first:
 
-If you want to control a remote node and open its web service locally, go to [Remote Service Control](remote-service-control).
-
-If you are looking for legacy file transfer usage, see [Deprecated File Transfer](deprecated-file-transfer).
+- [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network)
+- [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
 
 ```bash
 $ ./fungi help

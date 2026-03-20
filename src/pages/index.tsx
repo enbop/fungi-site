@@ -66,7 +66,7 @@ const docs = [
     body: "Connect two of your own devices, trust them safely, and verify the link with ping.",
   },
   {
-    title: "3 Minutes: Run A Remote Sandbox App",
+    title: "2 Minutes: Run A Remote Sandbox App",
     href: "/docs/quick-start/remote-sandbox-app",
     body: "Start a sandboxed app on one device and open it locally from another device.",
   },

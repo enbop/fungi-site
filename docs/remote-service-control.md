@@ -103,7 +103,7 @@ That gives you four layers of visibility:
 
 ## Related Reading
 
-- [CLI Service Quick Start](cli-service-quick-start)
+- [Fungi CLI Guide](cli-service-quick-start)
 - [Runtime Examples](runtime-examples)
 - [Services And Runtimes](service-manifests)
 - [Built-in WASI Support](wasi)

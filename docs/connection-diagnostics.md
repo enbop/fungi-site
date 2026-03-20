@@ -94,6 +94,6 @@ Stop with `Ctrl+C`.
 
 ## Related Docs
 
-- [CLI Service Quick Start](cli-service-quick-start)
+- [Fungi CLI Guide](cli-service-quick-start)
 - [gRPC Guide](grpc-guide)
 - [Self-hosted Relay](self-hosted-relay)

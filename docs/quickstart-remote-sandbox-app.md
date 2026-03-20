@@ -1,153 +1,162 @@
 ---
-title: "3-Minute Quick Start: Run a Remote Sandbox App Locally"
-description: "Start a sandboxed app on one device and open it locally from another device through Fungi."
+title: "2-Minute Quick Start: Run a Remote Sandbox App Locally"
+description: "After your device can already ping another device, start a remote sandbox app and open it locally in a few commands."
 slug: /quick-start/remote-sandbox-app
 ---
 
-# 3-Minute Quick Start: Run a Remote Sandbox App Locally
+# 2-Minute Quick Start: Run a Remote Sandbox App Locally
 
-This guide shows how to start a sandboxed app on one device and open it locally from another device.
+This guide starts where the [previous quick start](/docs/quick-start/private-p2p-network) ended.
 
-The app runs on the remote machine. Fungi gives you a local entry point to it.
-
-In this example:
-
-- Device A: `laptop-A`
-- Device B: `pc-B`
-- Demo app: `filebrowser-lite-wasi`
-
-This guide assumes you already finished [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network), so:
-
-- both devices already run `fungi daemon`
-- `laptop-A` already has `pc-B` in its address book
-- `pc-B` already allows inbound access from `laptop-A`
-
-If you want the detailed explanation of the `service`, `catalog`, and `access` workflow, see [Remote Service Control](/docs/remote-service-control).
-
-## Before You Start
-
-Download the example manifest on the machine that will control the remote peer.
-
-- [Download filebrowser-lite-wasi.service.yaml](/downloads/manifests/filebrowser-lite-wasi.service.yaml)
-
-You can save it anywhere convenient. In the examples below, it is saved in the current directory.
-
-## Step 1: Confirm `Device B` In The Address Book
-
-On `Device A` (`laptop-A`), make sure the remote device is already saved as `pc-B`:
+Now you can already ping `home-pc` from `my-laptop` by alias:
 
 ```bash
-./fungi device list
+./fungi ping home-pc
 ```
 
-If it is not there yet, add it first:
+```text
+Target peer: home-pc(16Uiu2H........ZC3bdZ)
+Ping stream peer=16Uiu2H........ZC3bdZ interval=2000ms (Ctrl+C to stop)
+TICK   CONN   DIR      RLY   RTT        ADDR/MSG
+0      -      -        -     -          connecting
+1      6      outbound no    5ms        /ip4/192.168.x.x/tcp/45189/p2p/16Uiu2H........ZC3bdZ
+2      6      outbound no    6ms        /ip4/192.168.x.x/tcp/45189/p2p/16Uiu2H........ZC3bdZ
+```
+
+> This means:
+> - `my-laptop` and `home-pc` already have an encrypted connection.
+> - `home-pc` already allows inbound control from `my-laptop`
+> - `home-pc` is already saved in `my-laptop`'s address book that allows you directly use the `home-pc` alias in later commands.
+
+
+In this example, you will control `home-pc` from `my-laptop`, and the demo app is `filebrowser-lite-wasi`.
+
+The goal is simple:
+
+- pull a sandboxed app to `home-pc`
+- start it remotely from `my-laptop`
+- open it locally in your browser on `my-laptop`
+
+> If you want the full model behind `peer`, `service`, `catalog`, and `access`, see [Remote Service Control](/docs/remote-service-control).
+
+## Download The Example Manifest
+
+Download the example manifest `filebrowser-lite-wasi.service.yaml` on `my-laptop`.
+
+- <a href="/downloads/manifests/filebrowser-lite-wasi.service.yaml" download>Direct download: filebrowser-lite-wasi.service.yaml</a>
+
+Or download it from the terminal:
 
 ```bash
-./fungi device add --alias pc-B <peer-id-of-pc-B>
+curl -L -O https://fungi.rs/downloads/manifests/filebrowser-lite-wasi.service.yaml
 ```
 
-## Step 2: Pull The Sandbox App To `Device B`
+>- `filebrowser-lite` is an experimental Fungi demo app based on a fork of [filebrowser](https://github.com/filebrowser/filebrowser). 
+>- `filebrowser` is a popular open-source web app that provides a file explorer interface to a specified host directory.
+>- The [filebrowser-lite fork](https://github.com/enbop/filebrowser-lite/tree/master/filebrowser-lite-wasi) adds a minimal Rust backend and compiles the app into a WASI component.
 
-From `Device A` (`laptop-A`), ask `Device B` (`pc-B`) to pull the service manifest:
+## Set The Current Peer Context
+
+Tell the CLI that the current remote target is `home-pc`:
 
 ```bash
-./fungi peer admin service pull --peer pc-B ./filebrowser-lite-wasi.service.yaml
+./fungi peer use home-pc
 ```
 
-What this does:
+Show the current peer context to verify:
+```bash
+./fungi peer current
+```
 
-- sends the manifest to the remote device
-- tells the remote device how to fetch the WASI app
-- prepares a named service instance called `filebrowser-lite-wasi`
+After this, later remote commands can omit `--peer home-pc`.
 
-If you want to inspect what the remote node can run before you start it, use:
+## Launch The Remote Sandbox App
+
+Run these three commands on `my-laptop`:
 
 ```bash
-./fungi peer capability --peer pc-B
+./fungi peer admin service pull ./filebrowser-lite-wasi.service.yaml
+./fungi peer admin service start filebrowser-lite-wasi
+./fungi access open filebrowser-lite-wasi
 ```
 
-## Step 3: Start The App On `Device B`
+What happens:
 
-Still on `Device A` (`laptop-A`), start the service on `Device B` (`pc-B`):
+- `pull` sends the manifest to `home-pc` and lets it fetch the WASI artifact
+- `start` runs the app on `home-pc`
+- `access open` creates a local entry point and opens the browser automatically
+
+Done.
+
+The app runs on `home-pc`, but you use it from `my-laptop` through the encrypted Fungi connection. 
+
+## What Just Ran On `home-pc`
+
+`filebrowser-lite-wasi` uses the built-in WASI runtime that ships with Fungi.
+
+That means:
+
+- the app runs in a sandboxed runtime on `home-pc`
+- by default, one app can only access its own service directory under `~/.fungi/services/<APP_NAME>` (on `home-pc`)
+- you can explicitly grant more host paths later if you need them
+
+## Optional: Check State And Capabilities
+
+If you want to see what is happening under the hood, these commands are the most useful:
 
 ```bash
-./fungi peer admin service start --peer pc-B filebrowser-lite-wasi
+./fungi peer capability
+./fungi peer admin service list
+./fungi peer admin service inspect filebrowser-lite-wasi
+./fungi catalog list
+./fungi catalog inspect filebrowser-lite-wasi
+./fungi access list
 ```
 
-At this point, the app is running on the remote machine, not on your local machine.
+Use them like this:
 
-If you want to confirm its state:
+- `peer capability` shows what the remote node can run
+- `peer admin service list` shows what is installed and running on `home-pc`
+- `catalog` shows what `home-pc` publishes for consumption
+- `access list` shows local entry points created on `my-laptop`
+
+## Optional: Try The Docker Runtime
+
+If you run `./fungi peer capability`, you may also see Docker support on the remote node.
+
+When Docker is available on `home-pc`, Fungi detects it automatically and manages it through a dedicated agent layer.
+
+Important limits in Docker mode:
+
+- Fungi only allows containers to use host paths and host ports that its capability policy allows
+- if a manifest asks for paths or ports outside that boundary, Fungi rejects it
+- Fungi only manages containers created by Fungi itself, never touches unrelated containers that already exist on the host
+
+>If the remote node is Linux, Docker should already be configured so it can run without `sudo`.
+
+Download the Docker manifest:
+
+- <a href="/downloads/manifests/filebrowser.service.yaml" download>Direct download: filebrowser.service.yaml</a>
+
+Or download it from the terminal:
 
 ```bash
-./fungi peer admin service list --peer pc-B
-./fungi peer admin service inspect --peer pc-B filebrowser-lite-wasi
+curl -L -O https://fungi.rs/downloads/manifests/filebrowser.service.yaml
 ```
 
-## Step 4: Check What `Device B` Publishes
-
-Now check the published service catalog:
+Then use the same three-step flow:
 
 ```bash
-./fungi catalog list --peer pc-B
-./fungi catalog inspect --peer pc-B filebrowser-lite-wasi
+./fungi peer admin service pull ./filebrowser.service.yaml
+./fungi peer admin service start filebrowser
+./fungi access open filebrowser
 ```
 
-This tells you whether the remote service is exposed for consumption.
-
-## Step 5: Open The Remote App On `Device A`
-
-Create or reuse a local access entry and open the app:
-
-```bash
-./fungi access open --peer pc-B filebrowser-lite-wasi
-```
-
-Fungi will create a local URL for the remote app and open it in your browser.
-
-Conceptually, the flow looks like this:
-
-1. the app runs on `Device B` (`pc-B`)
-2. `Device B` publishes it through Fungi
-3. `Device A` (`laptop-A`) creates a local entry point
-4. your browser opens that local address
-
-## Minimal End-To-End Flow
-
-If you just want the shortest command sequence:
-
-```bash
-./fungi peer admin service pull --peer pc-B ./filebrowser-lite-wasi.service.yaml
-./fungi peer admin service start --peer pc-B filebrowser-lite-wasi
-./fungi catalog list --peer pc-B
-./fungi access open --peer pc-B filebrowser-lite-wasi
-```
-
-## If Something Does Not Work
-
-Check the connection first:
-
-```bash
-./fungi ping pc-B
-./fungi conn overview
-```
-
-Check whether the remote service is running:
-
-```bash
-./fungi peer admin service list --peer pc-B
-./fungi peer admin service inspect --peer pc-B filebrowser-lite-wasi
-```
-
-Check whether the service is published:
-
-```bash
-./fungi catalog list --peer pc-B
-```
-
-For deeper troubleshooting, see [Connection Diagnostics](/docs/connection-diagnostics) and [Remote Service Control](/docs/remote-service-control).
+That is the Docker-backed version of the same remote app experience.
 
 ## What To Read Next
 
 - [Remote Service Control](/docs/remote-service-control) for the full mental model
 - [Services And Runtimes](/docs/service-manifests) for manifest structure and runtime policy
 - [Runtime Examples](/docs/runtime-examples) for Docker and WASI examples side by side
+- [Connection Diagnostics](/docs/connection-diagnostics) if something does not work
