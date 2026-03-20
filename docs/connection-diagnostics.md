@@ -4,7 +4,7 @@ This guide explains how to observe active connections and verify peer connectivi
 
 > Prerequisite: `fungi daemon` must be running.
 >
-> Need binaries first? Download Fungi CLI from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+> Need binaries first? Start at [Install Fungi](/docs/install).
 
 ## Why This Matters
 

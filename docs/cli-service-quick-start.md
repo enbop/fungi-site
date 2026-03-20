@@ -56,7 +56,7 @@ Fungi CLI commands can be divided into four main categories:
 
 ## Prerequisites
 
-1. Download and have Fungi CLI binary ready from [GitHub Releases](https://github.com/enbop/fungi/releases/latest)
+1. Install Fungi CLI first from [Install Fungi](/docs/install)
 2. Keep one terminal available for `fungi daemon`
 3. Know the PeerIDs of the devices you want to connect
 

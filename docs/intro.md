@@ -6,7 +6,7 @@ sidebar_position: 1
 
 Fungi helps you build a private encrypted P2P device network, then run and consume capability-first services across that network.
 
-Download the latest binaries from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+Install Fungi from the one-line installer, GitHub Releases, or source build: [Install Fungi](/docs/install).
 
 ## Start Here First
 
@@ -31,6 +31,7 @@ Download the latest binaries from [GitHub Releases](https://github.com/enbop/fun
 
 - [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network): the shortest newcomer path to connect two devices.
 - [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app): the shortest newcomer path to run a remote app and open it locally.
+- [Install Fungi](/docs/install): quick install, releases, Windows entry point, source build, and Linux `systemd --user` notes.
 - [Fungi CLI Guide](/docs/cli-service-quick-start): detailed CLI setup flow for local init, trust, peer context, and service basics.
 - [Services And Runtimes](/docs/service-manifests): service manifests, runtime model, and publish/access flow.
 - [Runtime Examples](/docs/runtime-examples): direct Docker and Wasmtime manifest downloads plus side-by-side runtime examples.

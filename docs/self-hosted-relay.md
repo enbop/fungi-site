@@ -2,7 +2,7 @@
 
 This guide shows you how to set up your own relay server using Fungi CLI for improved network connectivity.
 
-Need Fungi CLI binaries? Download from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+Need Fungi CLI first? Start at [Install Fungi](/docs/install).
 
 ## What is a Relay?
 

@@ -75,6 +75,59 @@
   font-weight: 500;
 }
 
+.installCallout {
+  max-width: 44rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1rem 0.95rem;
+  border-radius: 22px;
+  background: rgba(255, 250, 241, 0.88);
+  border: 1px solid rgba(42, 62, 47, 0.12);
+  box-shadow: 0 14px 34px rgba(36, 54, 41, 0.08);
+}
+
+.installLabel {
+  margin: 0 0 0.55rem;
+  color: #7a5e2f;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.installCode {
+  flex: 1;
+  display: block;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  background: #1f3025;
+  color: #fff4d8;
+  font-size: 1rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.installBar {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.copyButton {
+  border: 0;
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  background: #d8b16d;
+  color: #203126;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.copyButton:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+}
+
 .heroPanel {
   position: relative;
   padding: 1.35rem;
@@ -162,10 +215,21 @@
     justify-content: center;
   }
 
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .heroDescription,
   .heroTagline {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .installCallout {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
   }
 }
 
@@ -193,7 +257,15 @@
   border-radius: 999px;
   padding: 0.85rem 1.2rem;
   font-weight: 700;
+  gap: 0.55rem;
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.buttonIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .primaryButton {
@@ -257,7 +329,7 @@
 }
 
 .cardGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .workflowGrid {
@@ -332,6 +404,23 @@
   color: #c8d2c5;
 }
 
+[data-theme='dark'] .installCallout {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .installLabel {
+  color: #f0c67b;
+}
+
+[data-theme='dark'] .installCode {
+  background: rgba(15, 22, 17, 0.72);
+}
+
+[data-theme='dark'] .copyButton {
+  background: #f0c67b;
+}
+
 [data-theme='dark'] .badge {
   background: rgba(255, 248, 233, 0.08);
   border-color: rgba(198, 217, 170, 0.16);
@@ -377,6 +466,15 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+[data-theme='dark'] .bottomCta {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .bottomCtaText {
+  color: #d3ddcf;
+}
+
 .deprecatedCallout {
   margin-top: 1.4rem;
   background: linear-gradient(135deg, #2b3f31 0%, #415944 100%);
@@ -409,6 +507,32 @@
   font-weight: 700;
 }
 
+.bottomCta {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(42, 62, 47, 0.12);
+  box-shadow: 0 18px 42px rgba(36, 54, 41, 0.08);
+  text-align: center;
+}
+
+.bottomCtaText {
+  max-width: 36rem;
+  margin: 0.9rem auto 0;
+  color: #435548;
+  line-height: 1.7;
+}
+
+.bottomCtaActions {
+  display: flex;
+  justify-content: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-top: 1.4rem;
+}
+
 @keyframes floatOrb {
   0% {
     transform: translateY(0px) translateX(0px);
@@ -431,10 +555,30 @@
   }
 }
 
+@media screen and (max-width: 1200px) {
+
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media screen and (max-width: 996px) {
 
   .cardGrid,
   .workflowGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 640px) {
+
+  .installBar {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .bottomCtaActions {
+    flex-direction: column;
+    align-items: center;
   }
 }

@@ -19,7 +19,7 @@ In this example, assume your two devices are named `my-laptop` and `home-pc`.
 
 ## Before You Start
 
-1. Download Fungi CLI on both devices from [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
+1. Install Fungi CLI on both devices from [Install Fungi](/docs/install).
 2. Open two terminals on each device if possible:
    - one terminal for `fungi daemon`
    - one terminal for the commands in this guide

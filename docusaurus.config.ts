@@ -79,12 +79,20 @@ const config: Config = {
       },
       items: [
         {
-          type: "docSidebar",
-          sidebarId: "tutorialSidebar",
+          to: "/docs/install",
+          position: "left",
+          label: "Install",
+        },
+        {
+          to: "/docs/intro",
           position: "left",
           label: "Docs",
         },
-        // { to: "/blog", label: "Blog", position: "left" },
+        {
+          href: "https://discord.gg/A2vUXXB726",
+          label: "Discord",
+          position: "right",
+        },
         {
           href: "https://github.com/enbop/fungi",
           label: "GitHub",
@@ -95,45 +103,32 @@ const config: Config = {
     footer: {
       style: "dark",
       links: [
-        // {
-        //   title: "Docs",
-        //   items: [
-        //     {
-        //       label: "Docs",
-        //       to: "/docs/intro",
-        //     },
-        //   ],
-        // },
-        // {
-        //   title: "Community",
-        //   items: [
-        //     {
-        //       label: "Stack Overflow",
-        //       href: "https://stackoverflow.com/questions/tagged/docusaurus",
-        //     },
-        //     {
-        //       label: "Discord",
-        //       href: "https://discordapp.com/invite/docusaurus",
-        //     },
-        //     {
-        //       label: "X",
-        //       href: "https://x.com/docusaurus",
-        //     },
-        //   ],
-        // },
-        // {
-        //   title: "More",
-        //   items: [
-        //     // {
-        //     //   label: "Blog",
-        //     //   to: "/blog",
-        //     // },
-        //     {
-        //       label: "GitHub",
-        //       href: "https://github.com/enbop/fungi",
-        //     },
-        //   ],
-        // },
+        {
+          title: "Get Started",
+          items: [
+            {
+              label: "Install",
+              to: "/docs/install",
+            },
+            {
+              label: "Docs",
+              to: "/docs/intro",
+            },
+          ],
+        },
+        {
+          title: "Community",
+          items: [
+            {
+              label: "Discord",
+              href: "https://discord.gg/A2vUXXB726",
+            },
+            {
+              label: "GitHub",
+              href: "https://github.com/enbop/fungi",
+            },
+          ],
+        },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Fungi`,
     },

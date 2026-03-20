@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
@@ -61,6 +61,11 @@ const heroSteps = [
 
 const docs = [
   {
+    title: "Install Fungi",
+    href: "/docs/install",
+    body: "One-line install for macOS and Linux, plus GitHub Releases, Windows, source build, and Linux systemd notes.",
+  },
+  {
     title: "3 Minutes: Build Your Private P2P Network",
     href: "/docs/quick-start/private-p2p-network",
     body: "Connect two of your own devices, trust them safely, and verify the link with ping.",
@@ -77,8 +82,36 @@ const docs = [
   },
 ];
 
+const bottomActions = [
+  {
+    label: "Full install guide",
+    href: "/docs/install",
+    kind: "primary",
+  },
+  {
+    label: "Join Discord",
+    href: "https://discord.gg/A2vUXXB726",
+    kind: "secondary",
+    iconSrc: "/img/discord.png",
+  },
+];
+
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
+  const [copied, setCopied] = useState(false);
+
+  async function copyInstallCommand() {
+    try {
+      await navigator.clipboard.writeText(
+        "curl -fsSL https://fungi.rs/install.sh | sh",
+      );
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  }
+
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
@@ -97,18 +130,30 @@ function HomepageHeader() {
               Build your own encrypted device mesh, run services under explicit
               runtime policy, and control remote nodes from a local CLI or GUI.
             </p>
+            <div className={styles.installCallout}>
+              <p className={styles.installLabel}>macOS / Linux quick install</p>
+              <div className={styles.installBar}>
+                <code className={styles.installCode}>
+                  curl -fsSL https://fungi.rs/install.sh | sh
+                </code>
+                <button
+                  type="button"
+                  className={styles.copyButton}
+                  onClick={copyInstallCommand}
+                >
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
             <div className={styles.buttons}>
-              <Link
-                className={styles.primaryButton}
-                to="/docs/quick-start/private-p2p-network"
-              >
-                Quick Start
+              <Link className={styles.primaryButton} to="/docs/install">
+                Full install guide
               </Link>
               <Link
                 className={styles.secondaryButton}
-                to="https://github.com/enbop/fungi/releases/latest"
+                to="/docs/quick-start/private-p2p-network"
               >
-                Download Fungi CLI
+                Quick Start
               </Link>
               <Link
                 className={styles.secondaryButton}
@@ -189,7 +234,7 @@ export default function Home(): ReactNode {
             <div className={styles.sectionHeader}>
               <p className={styles.eyebrow}>Start Here</p>
               <Heading as="h2" className={styles.sectionTitle}>
-                Beginner-first docs, then deeper references
+                Install first, then move through quick starts and references
               </Heading>
             </div>
             <div className={styles.cardGrid}>
@@ -231,6 +276,44 @@ export default function Home(): ReactNode {
                 </Link>
               </div>
             </aside>
+          </div>
+        </section>
+
+        <section className={styles.sectionAlt}>
+          <div className="container">
+            <div className={styles.bottomCta}>
+              <p className={styles.eyebrow}>Get Started</p>
+              <Heading as="h2" className={styles.sectionTitle}>
+                Install Fungi, then join the community if you get stuck
+              </Heading>
+              <p className={styles.bottomCtaText}>
+                Start with the install guide, or jump into Discord for release
+                updates, questions, and feedback.
+              </p>
+              <div className={styles.bottomCtaActions}>
+                {bottomActions.map((item) => (
+                  <Link
+                    key={item.label}
+                    className={
+                      item.kind === "primary"
+                        ? styles.primaryButton
+                        : styles.secondaryButton
+                    }
+                    to={item.href}
+                  >
+                    {item.iconSrc ? (
+                      <img
+                        src={item.iconSrc}
+                        alt=""
+                        aria-hidden="true"
+                        className={styles.buttonIcon}
+                      />
+                    ) : null}
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </main>
