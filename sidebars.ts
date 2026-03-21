@@ -23,6 +23,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'quickstart-private-p2p-network',
         'quickstart-remote-sandbox-app',
+        'quickstart-tcp-tunnel',
       ],
     },
     {

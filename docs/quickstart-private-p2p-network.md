@@ -201,9 +201,10 @@ This is expected. Fungi does not automatically create mutual trust.
 
 Continue with [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app).
 
-If you want more detail before that, see:
+If you want more detail, see:
 
 - [Fungi CLI Guide](/docs/cli-service-quick-start)
+- [2-Minute Quick Start: Forward A TCP Port](/docs/quick-start/tcp-tunnel)
 - [Connection Diagnostics](/docs/connection-diagnostics)
 - [Remote Service Control](/docs/remote-service-control)
 - [Services And Runtimes](/docs/service-manifests)

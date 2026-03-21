@@ -156,9 +156,13 @@ fungi access open filebrowser
 
 That is the Docker-backed version of the same remote app experience.
 
-## What To Read Next
+## Next Step
+
+Continue with [Services And Runtimes](/docs/service-manifests) to **write your own manifest** step by step.
+
+If you want more detail, see:
 
 - [Remote Service Control](/docs/remote-service-control) for the full mental model
-- [Services And Runtimes](/docs/service-manifests) for manifest structure and runtime policy
-- [Runtime Examples](/docs/runtime-examples) for Docker and WASI examples side by side
+- [Runtime Examples](/docs/runtime-examples) for the direct built-in example downloads
+- [2-Minute Quick Start: Forward A TCP Port](/docs/quick-start/tcp-tunnel) if you want raw TCP forwarding instead of service manifests
 - [Connection Diagnostics](/docs/connection-diagnostics) if something does not work

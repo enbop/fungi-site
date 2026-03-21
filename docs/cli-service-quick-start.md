@@ -1,15 +1,18 @@
 ---
 title: Fungi CLI Guide
-description: Detailed guide to the Fungi CLI commands, daemon workflow, peer context, and service basics.
+description: Command-oriented guide to what the Fungi CLI commands do and when to use each group.
 sidebar_position: 2
 ---
 
 # Fungi CLI Guide
 
-If you are new to Fungi, start with the quick starts first:
+This page is a command guide, not a step-by-step onboarding flow.
+
+If you want the shortest hands-on setup path first, start with the quick starts:
 
 - [3-Minute Quick Start: Build Your Private P2P Network](/docs/quick-start/private-p2p-network)
 - [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
+- [2-Minute Quick Start: Forward A TCP Port](/docs/quick-start/tcp-tunnel)
 
 ```bash
 $ fungi help
@@ -45,7 +48,7 @@ Options:
 
 ## Command Overview
 
-Fungi CLI commands can be divided into four main categories:
+Fungi CLI commands fall into four broad groups:
 
 | Category | Commands | Notes |
 |----------|----------|-------|
@@ -54,160 +57,282 @@ Fungi CLI commands can be divided into four main categories:
 | **Daemon Management Commands** | `info`, `security` (`sec`), `tunnel` (`tn`), `service` (`svc`), `catalog`, `access`, `peer`, `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** |
 | **Connection Diagnostics Commands** | `connection` (`conn`), `ping` | Observe active connections/streams and continuously measure peer RTT. **Require `fungi daemon` to be running first.** |
 
-## Prerequisites
+## Common Pattern
 
-1. Install Fungi CLI first from [Install Fungi](/docs/install)
-2. Keep one terminal available for `fungi daemon`
-3. Know the PeerIDs of the devices you want to connect
+For almost everything except `init`, `daemon`, `relay`, `run`, and `serve`, the CLI is talking to a running local daemon.
 
-## Step 1: Initialize Configuration
-
-First, initialize the configuration file (use `-f` to specify a custom path if needed; global options should be placed before the command):
-
-```bash
-fungi init
-# custom config dir
-fungi -f /path/to/fungi init
-# rewrite an existing config.toml using the current schema/default sections
-fungi init --upgrade-config
-```
-
-This will create a configuration file at `~/.fungi/config.toml` and display the path in the output.
-
-## Step 2: Start the Daemon
-
-Start the Fungi daemon (use `-f` to specify a custom config path if needed; place it before `daemon`):
+That means this is the normal baseline:
 
 ```bash
 fungi daemon
-# custom config dir
+```
+
+Then open another terminal for the commands below.
+
+If you need installation instructions, go to [Install Fungi](/docs/install).
+
+## Core Commands
+
+`init`
+
+- creates the local Fungi config directory and key material
+- use `fungi init --upgrade-config` when you want to rewrite an older config with current sections
+
+Examples:
+
+```bash
+fungi init
+fungi -f /path/to/fungi init
+fungi init --upgrade-config
+```
+
+`daemon`
+
+- starts the local daemon
+- this is the main process behind most CLI commands
+
+Examples:
+
+```bash
+fungi daemon
 fungi -f /path/to/fungi daemon
 ```
 
-Keep the daemon running in this terminal.
+`relay`
 
-## Step 3: Get Your PeerID
+- starts a relay node for connectivity troubleshooting or self-hosted routing setups
 
-Open a new terminal and get your device's PeerID:
+Example:
+
+```bash
+fungi relay
+```
+
+## Info And Local Runtime Status
+
+Use `info` when you want to inspect the local node itself.
+
+Common commands:
 
 ```bash
 fungi info id
+fungi info runtime
 ```
 
-This will display your device's PeerID, which you can share with other devices that need to connect to you.
+What they are for:
 
-## Step 3.5: Name Remote Peers In The Address Book
+- `info id` prints the current node's PeerID
+- `info runtime` shows whether Docker and Wasmtime are configured, detected, and active
 
-New user-facing peer workflows are alias-first. Before adding a peer to security policy or targeting it with remote commands, register it with a unique alias:
+## Address Book And Peer Targeting
+
+Use `device` to manage the local address book.
+
+Common commands:
 
 ```bash
-fungi device add 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --alias macbook
+fungi device mdns
+fungi device add <peer-id> --alias home-pc
 fungi device list
-fungi peer use macbook
+```
+
+Use `peer use` when you want later remote commands to default to one target peer:
+
+```bash
+fungi peer use home-pc
 fungi peer current
 ```
 
-After `peer use`, later `catalog`, `access`, and `peer admin` commands can omit `--peer`. The CLI prints the resolved target peer before each remote operation so you can see exactly which node it is using.
+This is the alias-first remote workflow Fungi is moving toward.
 
-## Step 4: Configure Trust And Start A Local Service
+## Security Commands
 
-Now you can configure your Fungi services while the daemon is running.
+Use `security` when you want to manage what remote peers are allowed to do against this node.
 
-### Add Allowed Peers
-
-> **⚠️ Security Notice:** Only add peers you trust. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
-
-Add a named peer to the incoming allowlist:
+Common commands:
 
 ```bash
-fungi security allowed-peers add macbook
+fungi security allowed-peers add home-pc
+fungi security allowed-peers list
+fungi sec allowed-peers add home-pc
 ```
 
-Or use the short top-level alias:
+Use this group for:
+
+- incoming peer allowlists
+- runtime safety boundaries such as host paths and ports
+- checking what you are exposing to trusted peers
+
+## Service Commands
+
+Use `service` for local service lifecycle management from service manifests.
+
+Common commands:
 
 ```bash
-fungi sec allowed-peers add macbook
+fungi service pull ./my-service.yaml
+fungi service list
+fungi service start my-service
+fungi service inspect my-service
+fungi service logs my-service --tail 50
+fungi service stop my-service
+fungi service remove my-service
 ```
 
-To view the current list of allowed peers:
+Use this group when:
+
+- the service runs on the current node
+- you are testing a manifest locally before using it on another peer
+- you want logs and inspect output for one named service instance
+
+If you want to write your own manifest, continue with [Services And Runtimes](service-manifests).
+
+## Remote Peer Commands
+
+Use `peer admin service` when you want to control services on another node.
+
+Typical commands:
 
 ```bash
-fungi sec allowed-peers list
+fungi peer capability --peer <peer-id>
+fungi peer admin service pull --peer <peer-id> ./my-service.yaml
+fungi peer admin service list --peer <peer-id>
+fungi peer admin service start --peer <peer-id> my-service
+fungi peer admin service inspect --peer <peer-id> my-service
 ```
 
-Pull and start a local service:
+Use this group when:
+
+- the service should run on a remote node
+- you want to inspect that node's runtime capabilities first
+- you want a controller machine to manage another device
+
+## Catalog And Access Commands
+
+Use `catalog` and `access` after a remote service is already running and exposed.
+
+Typical commands:
 
 ```bash
-fungi service pull ./examples/service-manifests/filebrowser.service.yaml
-fungi service start filebrowser
-fungi service inspect filebrowser
+fungi catalog list --peer <peer-id>
+fungi catalog inspect --peer <peer-id> my-service
+fungi access open --peer <peer-id> my-service
+fungi access list --peer <peer-id>
+fungi access detach --peer <peer-id> my-service
 ```
 
-For a remote-node workflow built on `peer`, `catalog`, and `access`, continue with [Remote Service Control](remote-service-control).
+Use `catalog` for discovery and `access` for creating the local entry point to a remote service.
 
-## Optional: Check Connection Health
+This is the right workflow when the remote app is managed by a service manifest.
 
-Use diagnostics when you want to verify active links and stream state:
+## Tunnel Commands
+
+Use `tunnel` for raw TCP forwarding rules.
+
+Common commands:
+
+```bash
+fungi tunnel show
+fungi tunnel add-listen 127.0.0.1:8080
+fungi tunnel add-forward 127.0.0.1:18080 <peer-id> 8080
+fungi tunnel remove-forward 127.0.0.1:18080 <peer-id> 8080
+fungi tunnel remove-listen 127.0.0.1:8080
+```
+
+Use this group when:
+
+- you already know the raw TCP port you want
+- the target app is not managed by a Fungi service manifest
+- you want a quick point-to-point forward
+
+If the app is already managed as a Fungi service, you usually do not need to create tunnel rules by hand. Prefer `service`, `catalog`, and `access` instead.
+
+For the shortest tunnel walkthrough, use [2-Minute Quick Start: Forward A TCP Port](/docs/quick-start/tcp-tunnel).
+
+## Connection Diagnostics
+
+Use `connection` and `ping` when you want to observe active connectivity instead of changing configuration.
+
+Typical commands:
 
 ```bash
 fungi conn overview
 fungi conn streams
-fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --interval-ms 2000
+fungi ping <peer-id>
+fungi ping <peer-id> --interval-ms 2000 --verbose
 ```
 
-Add `--verbose` when you need full peer IDs and detailed addresses.
+Use them when:
 
-## Next Reading
+- a peer should already be reachable but is not behaving as expected
+- you want to see active streams and protocols
+- you want continuous RTT information
 
-- [Remote Service Control](remote-service-control): use `peer`, `catalog`, and `access` to manage a remote node and open its web app locally.
-- [Services And Runtimes](service-manifests): service manifest structure and runtime details.
-- [Built-in WASI Support](wasi): run or serve WASI workloads.
-- [Deprecated File Transfer](deprecated-file-transfer): old FTP/WebDAV-based file sharing path.
+## WASI Runtime Commands
 
-### Key Configuration Sections
+`run` and `serve` are direct Wasmtime command re-exports.
 
-#### Network Settings
+Examples:
+
+```bash
+fungi run ./component.wasm
+fungi serve ./component.wasm
+```
+
+Use them when you want to run a Wasm component directly, outside the higher-level service-manifest workflow.
+
+## Global Options
+
+The most important global option is `--fungi-dir`.
+
+Use it before the command name:
+
+```bash
+fungi -f /path/to/fungi info id
+fungi -f /path/to/fungi daemon
+```
+
+## Configuration File Sections
+
+If you prefer editing config directly instead of using CLI commands, these are the sections you will care about most.
+
+### Network Settings
 
 ```toml
 [network]
 listen_tcp_port = 0  # 0 means auto-assign
 listen_udp_port = 0  # 0 means auto-assign
 incoming_allowed_peers = [
-	"16Uiu2****"  # PeerIDs that can connect to this device
+  "16Uiu2****"
 ]
 ```
 
-> **⚠️ Security Notice:** Only add trusted peers here. Devices in the allowed peers list will have access to your device through Fungi services (file sharing, port forwarding).
-
-You can also manage this list using `fungi security allowed-peers add` and `fungi security allowed-peers list`.
-
-#### Port Forwarding
+### Port Forwarding
 
 ```toml
 [tcp_tunneling.listening]
 enabled = true
 rules = [
-	{ host = "127.0.0.1", port = 22 }  # Expose SSH to remote devices
-	{ host = "127.0.0.1", port = 8080 }  # Expose HTTP server
+  { host = "127.0.0.1", port = 22 }
+  { host = "127.0.0.1", port = 8080 }
 ]
 ```
 
-These ports will be accessible to allowed peers on your device.
-
-#### File Sharing
+### File Sharing
 
 ```toml
 [file_transfer.server]
 enabled = true
-shared_root_dir = "/tmp"  # Directory to share with remote devices
+shared_root_dir = "/tmp"
 ```
 
-Remote devices will be able to browse and access files in this directory.
-
-> **Note:** After editing the configuration file, you need to restart the daemon for changes to take effect. CLI commands like `fungi sec allowed-peers add macbook` take effect immediately without restarting.
+After editing the config file directly, restart the daemon for those changes to take effect. CLI commands such as `fungi sec allowed-peers add home-pc` apply immediately without a restart.
 
 ## Related Guides
 
+- [Remote Service Control](remote-service-control)
+- [Services And Runtimes](service-manifests)
+- [2-Minute Quick Start: Forward A TCP Port](/docs/quick-start/tcp-tunnel)
 - [Connection Diagnostics](connection-diagnostics)
 - [gRPC Guide](grpc-guide)
 - [Self-hosted Relay](self-hosted-relay)
