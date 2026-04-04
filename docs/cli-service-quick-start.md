@@ -22,8 +22,8 @@ Usage: fungi [OPTIONS] <COMMAND>
 
 Commands:
   init          Initialize a Fungi configuration, and generate a keypair
-  daemon        Start a Fungi daemon
-  relay         Start a simple Fungi relay server
+  daemon        Start a Fungi daemon or relay-server
+  relay         Manage relay configuration for the local daemon
   info          Show daemon information
   security      Manage runtime safety boundary settings and incoming peer allowlists [aliases: sec]
   ft-service    Manage file transfer service [aliases: fs]
@@ -52,14 +52,14 @@ Fungi CLI commands fall into four broad groups:
 
 | Category | Commands | Notes |
 |----------|----------|-------|
-| **Core Daemon Commands** | `init`, `daemon`, `relay` | Initialize and start Fungi services |
+| **Core Daemon Commands** | `init`, `daemon` | Initialize Fungi, start the daemon, and manage relay settings |
 | **WASI Runtime Commands** | `run`, `serve` | Re-exported wasmtime commands for WebAssembly modules |
 | **Daemon Management Commands** | `info`, `security` (`sec`), `tunnel` (`tn`), `service` (`svc`), `catalog`, `access`, `peer`, `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** |
 | **Connection Diagnostics Commands** | `connection` (`conn`), `ping` | Observe active connections/streams and continuously measure peer RTT. **Require `fungi daemon` to be running first.** |
 
 ## Common Pattern
 
-For almost everything except `init`, `daemon`, `relay`, `run`, and `serve`, the CLI is talking to a running local daemon.
+For almost everything except `init`, `daemon`, `run`, and `serve`, the CLI is talking to a running local daemon.
 
 That means this is the normal baseline:
 
@@ -90,23 +90,30 @@ fungi init --upgrade-config
 
 - starts the local daemon
 - this is the main process behind most CLI commands
+- also exposes `fungi daemon relay-server` for running a dedicated relay server process
 
 Examples:
 
 ```bash
 fungi daemon
 fungi -f /path/to/fungi daemon
+fungi daemon relay-server -p ${SERVER_PUBLIC_IP}
 ```
 
 `relay`
 
-- starts a relay node for connectivity troubleshooting or self-hosted routing setups
+- manages which relay addresses this node uses for outbound connectivity
+- works both before and after the daemon is already running
 
-Example:
+Examples:
 
 ```bash
-fungi relay
+fungi relay show
+fungi relay use-community off
+fungi relay add "/ip4/${SERVER_PUBLIC_IP}/tcp/30001/p2p/16Uiu2HAmxxx"
 ```
+
+If you want to self-host a relay server or disable the community relay before first startup, see [Self-hosted Relay](/docs/self-hosted-relay).
 
 ## Info And Local Runtime Status
 

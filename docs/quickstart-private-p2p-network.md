@@ -35,6 +35,8 @@ Run this command on both devices:
 fungi daemon
 ```
 
+> If you want to disable the built-in community relay or use your own relay addresses before the daemon makes network connections, configure relay settings first. See [Self-hosted Relay](/docs/self-hosted-relay).
+
 You will see startup logs similar to this:
 
 ```text
