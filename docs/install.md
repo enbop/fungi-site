@@ -19,6 +19,13 @@ This installs `fungi` into `~/.local/bin` by default.
 
 You can inspect the script first at [https://fungi.rs/install.sh](https://fungi.rs/install.sh).
 
+On macOS, we recommend installing the Fungi App GUI through our Homebrew tap:
+
+```bash
+brew tap enbop/fungi
+brew install --cask fungi-app
+```
+
 ## GitHub Releases
 
 If your platform is not covered by the quick installer, or you prefer manual installation, use [GitHub Releases](https://github.com/enbop/fungi/releases/latest).
