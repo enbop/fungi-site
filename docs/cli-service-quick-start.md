@@ -100,6 +100,8 @@ fungi -f /path/to/fungi daemon
 fungi daemon relay-server -p ${SERVER_PUBLIC_IP}
 ```
 
+The relay-server command also accepts `--tcp-listen-port`, `--udp-listen-port`, `--max-circuit-duration-secs`, and `--max-circuit-bytes` when you need to tune self-hosted relay behavior.
+
 `relay`
 
 - manages which relay addresses this node uses for outbound connectivity

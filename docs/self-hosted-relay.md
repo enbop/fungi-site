@@ -19,6 +19,18 @@ fungi daemon relay-server -p ${SERVER_PUBLIC_IP}
 - Replace `${SERVER_PUBLIC_IP}` with your server's actual public IP address
 - The relay defaults to listening on TCP and UDP port 30001
 - You can specify a different port using the `--tcp-listen-port` and `--udp-listen-port` flags if needed
+- The built-in relay now defaults to long-lived circuits suitable for SSH and TCP forwarding: `--max-circuit-duration-secs` defaults to `86400` and `--max-circuit-bytes` defaults to `u64::MAX(18446744073709551615)`
+- If you need stricter limits, override them explicitly on the CLI
+
+For example, a relay on custom ports with an explicit 12-hour circuit lifetime looks like this:
+
+```bash
+fungi daemon relay-server \
+    -p ${SERVER_PUBLIC_IP} \
+    --tcp-listen-port 30001 \
+    --udp-listen-port 30001 \
+    --max-circuit-duration-secs 43200
+```
 
 ## Step 2: Get Relay Addresses
 
