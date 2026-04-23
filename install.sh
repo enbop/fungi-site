@@ -11,12 +11,12 @@ usage() {
 Usage: install.sh [--version <tag>] [--install-dir <dir>]
 
 Options:
-  --version <tag>      Install a specific release tag, for example v0.6.0-preview.
+  --version <tag>      Install a specific release tag, for example v0.6.0-preview or nightly.
   --install-dir <dir>  Install directory for the fungi binary.
   --help               Show this help text.
 
 Environment:
-  FUNGI_VERSION        Same as --version.
+  FUNGI_VERSION        Same as --version. Use nightly for the nightly channel.
   FUNGI_INSTALL_DIR    Same as --install-dir.
 EOF
 }
@@ -37,7 +37,7 @@ need_cmd() {
 download() {
   url="$1"
   output="$2"
-  curl -fsSL --retry 3 --output "$output" "$url"
+  curl -fsSL --proto '=https' --tlsv1.2 --retry 3 --output "$output" "$url"
 }
 
 sha256_file() {
@@ -97,6 +97,54 @@ release_base_url() {
   fi
 }
 
+validate_version() {
+  case "$VERSION" in
+    ""|*[!A-Za-z0-9._+-]*)
+      if [ -n "$VERSION" ]; then
+        fail "--version may only contain letters, numbers, dots, underscores, plus signs, and hyphens"
+      fi
+      ;;
+  esac
+}
+
+validate_install_dir() {
+  [ -n "$INSTALL_DIR" ] || fail "--install-dir must not be empty"
+
+  case "$INSTALL_DIR" in
+    *'
+'*)
+      fail "--install-dir must not contain newlines"
+      ;;
+  esac
+
+  cr=$(printf '\r')
+  case "$INSTALL_DIR" in
+    *"$cr"*)
+      fail "--install-dir must not contain carriage returns"
+      ;;
+  esac
+}
+
+is_nightly() {
+  [ "$VERSION" = "nightly" ]
+}
+
+install_names() {
+  if is_nightly; then
+    BINARY_NAME="fungi-nightly"
+    SERVICE_NAME="fungi-nightly"
+    SERVICE_DESCRIPTION="Fungi nightly daemon"
+  else
+    BINARY_NAME="fungi"
+    SERVICE_NAME="fungi"
+    SERVICE_DESCRIPTION="Fungi daemon"
+  fi
+}
+
+systemd_quote_exec_path() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/%/%%/g'
+}
+
 install_systemd_user_service() {
   case "$PLATFORM" in
     linux-x86_64|linux-aarch64) ;;
@@ -108,18 +156,19 @@ install_systemd_user_service() {
   fi
 
   unit_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
-  unit_path="$unit_dir/fungi.service"
+  unit_path="$unit_dir/$SERVICE_NAME.service"
   mkdir -p "$unit_dir"
+  exec_path=$(systemd_quote_exec_path "$TARGET_PATH")
 
   cat > "$unit_path" <<EOF
 [Unit]
-Description=Fungi daemon
+Description=$SERVICE_DESCRIPTION
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=$TARGET_PATH daemon
+ExecStart="$exec_path" daemon
 Restart=on-failure
 RestartSec=5
 WorkingDirectory=%h
@@ -129,7 +178,6 @@ WantedBy=default.target
 EOF
 
   systemctl --user daemon-reload >/dev/null 2>&1 || true
-  systemctl --user enable fungi.service >/dev/null 2>&1 || true
 }
 
 print_path_hint() {
@@ -151,10 +199,11 @@ print_linux_service_hint() {
 
   say ""
   say "Linux service commands:"
+  say "  The installer writes the service unit but does not start or enable it automatically."
   say "  Start the daemon in the background now:"
-  say "    systemctl --user start fungi.service"
+  say "    systemctl --user start $SERVICE_NAME.service"
   say "  Start it automatically when your user logs in:"
-  say "    systemctl --user enable fungi.service"
+  say "    systemctl --user enable $SERVICE_NAME.service"
   say "  Keep it available after a real reboot before login:"
   say "    sudo loginctl enable-linger \"$USER\""
 }
@@ -182,11 +231,15 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
+validate_version
+validate_install_dir
+
 need_cmd curl
 need_cmd tar
 need_cmd mktemp
 
 detect_platform
+install_names
 
 ARTIFACT="fungi-$PLATFORM.tar.gz"
 BASE_URL=$(release_base_url)
@@ -194,7 +247,11 @@ ARCHIVE_URL="$BASE_URL/$ARTIFACT"
 CHECKSUM_URL="$ARCHIVE_URL.sha256"
 
 TMP_DIR=$(mktemp -d)
+TMP_TARGET=""
 cleanup() {
+  if [ -n "$TMP_TARGET" ] && [ -e "$TMP_TARGET" ]; then
+    rm -f "$TMP_TARGET"
+  fi
   rm -rf "$TMP_DIR"
 }
 trap cleanup EXIT INT TERM
@@ -208,16 +265,17 @@ EXPECTED_SHA=$(awk '{print $1}' "$TMP_DIR/$ARTIFACT.sha256")
 ACTUAL_SHA=$(sha256_file "$TMP_DIR/$ARTIFACT")
 [ "$EXPECTED_SHA" = "$ACTUAL_SHA" ] || fail "checksum mismatch for $ARTIFACT"
 
-tar -xzf "$TMP_DIR/$ARTIFACT" -C "$TMP_DIR"
+tar -xzf "$TMP_DIR/$ARTIFACT" -C "$TMP_DIR" fungi
 [ -f "$TMP_DIR/fungi" ] || fail "archive did not contain the fungi binary"
 
 mkdir -p "$INSTALL_DIR"
-TARGET_PATH="$INSTALL_DIR/fungi"
-TMP_TARGET="$INSTALL_DIR/.fungi.tmp.$$"
+TARGET_PATH="$INSTALL_DIR/$BINARY_NAME"
+TMP_TARGET=$(mktemp "$INSTALL_DIR/.$BINARY_NAME.tmp.XXXXXX")
 
 cp "$TMP_DIR/fungi" "$TMP_TARGET"
 chmod 755 "$TMP_TARGET"
 mv -f "$TMP_TARGET" "$TARGET_PATH"
+TMP_TARGET=""
 
 if [ "$(uname -s)" = "Darwin" ] && command -v xattr >/dev/null 2>&1; then
   xattr -d com.apple.quarantine "$TARGET_PATH" >/dev/null 2>&1 || true
@@ -225,11 +283,11 @@ fi
 
 install_systemd_user_service
 
-INSTALLED_VERSION=$($TARGET_PATH --version 2>/dev/null || printf 'fungi <unknown version>')
+INSTALLED_VERSION=$($TARGET_PATH --version 2>/dev/null || printf '%s <unknown version>' "$BINARY_NAME")
 say "Installed Fungi successfully."
 say "  Binary: $TARGET_PATH"
 say "  Version: $INSTALLED_VERSION"
 say ""
-say "If your current shell does not find 'fungi' immediately, run 'hash -r' or restart the shell."
+say "If your current shell does not find '$BINARY_NAME' immediately, run 'hash -r' or restart the shell."
 print_path_hint
 print_linux_service_hint
