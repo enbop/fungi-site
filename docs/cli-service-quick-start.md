@@ -113,7 +113,10 @@ Examples:
 fungi relay show
 fungi relay use-community off
 fungi relay add "/ip4/${SERVER_PUBLIC_IP}/tcp/30001/p2p/16Uiu2HAmxxx"
+fungi relay add "/ip4/${SERVER_PUBLIC_IP}/udp/30001/quic-v1/p2p/16Uiu2HAmxxx"
 ```
+
+Add both relay addresses when the relay publishes both. TCP is used for the durable relay reservation and relayed circuits; UDP/QUIC is used only as an observer for UDP address refresh before hole punching.
 
 If you want to self-host a relay server or disable the community relay before first startup, see [Self-hosted Relay](/docs/self-hosted-relay).
 

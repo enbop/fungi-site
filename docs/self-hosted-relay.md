@@ -43,6 +43,11 @@ After starting the relay, you'll see the relay addresses in the terminal output:
 
 Copy these addresses - you'll need them for client configuration.
 
+Fungi clients keep both relay addresses in the same config list, but they use them differently:
+
+- The TCP address maintains the long-lived relay reservation and carries relayed circuit traffic.
+- The UDP/QUIC address is an observer endpoint used to refresh UDP address discovery before direct hole punching.
+
 ## Step 3: Configure Fungi Clients
 
 On each client node, configure relay usage with the Fungi CLI. These commands work before or after the daemon is running.
@@ -71,7 +76,9 @@ incoming_allowed_peers = [...]
 relay_enabled = true
 use_community_relays = false
 custom_relay_addresses = [
+    # TCP keeps the relay reservation and relayed circuit traffic stable.
     "/ip4/{SERVER_PUBLIC_IP}/tcp/30001/p2p/16Uiu2HAmxxx",
+    # UDP/QUIC is observer-only for UDP address refresh before hole punching.
     "/ip4/{SERVER_PUBLIC_IP}/udp/30001/quic-v1/p2p/16Uiu2HAmxxx",
 ]
 ```
@@ -83,6 +90,8 @@ Restart any already-running Fungi daemon after changing relay settings so new co
 ## Important Notes
 
 - Adding custom relay addresses no longer implicitly replaces the community relay set. Use `fungi relay use-community off` when you want only your own relays.
+- Keep TCP and UDP/QUIC addresses together in `custom_relay_addresses`; Fungi separates TCP relay carriers from UDP observers internally.
+- Before relay fallback, Fungi can use the relay's `/fungi/relay-refresh/0.1.0` path to ask the target peer to refresh its UDP observer address, which improves the address information available before hole punching.
 - To re-enable the built-in community relay, run `fungi relay use-community on`.
 - To remove a custom relay, run `fungi relay remove <multiaddr>`.
 - Ensure your server's firewall allows traffic on port 30001 (or your custom port) for both TCP and UDP

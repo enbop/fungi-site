@@ -63,6 +63,16 @@ fungi conn streams --protocol-name /fungi/tunnel/8080/1.0.0
 fungi conn streams --verbose
 ```
 
+## Inspect Relay Status
+
+List configured relay endpoints and their current health:
+
+```bash
+fungi conn relay-status
+```
+
+In relay status output, TCP endpoints should be the stable reservation/circuit carriers. UDP/QUIC endpoints may appear without a relay listener because Fungi uses them only as observer endpoints for UDP address refresh before hole punching.
+
 ## Continuous Peer Ping
 
 Run continuous ping on all active connections to a peer:

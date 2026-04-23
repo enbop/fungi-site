@@ -16,6 +16,7 @@ curl -fsSL https://fungi.rs/install.sh | sh
 ```
 
 This installs `fungi` into `~/.local/bin` by default.
+With no version specified, the script installs the latest stable release.
 
 You can inspect the script first at [https://fungi.rs/install.sh](https://fungi.rs/install.sh).
 
@@ -77,18 +78,19 @@ Binary path:
 
 ## Linux systemd --user
 
-On Linux, the install script also tries to write a user service to:
+On Linux, the install script also writes a user service to:
 
 ```text
 ~/.config/systemd/user/fungi.service
 ```
 
-It also tries to run:
+For the nightly CLI, the service name is:
 
-```bash
-systemctl --user daemon-reload
-systemctl --user enable fungi.service
+```text
+~/.config/systemd/user/fungi-nightly.service
 ```
+
+The installer reloads user units when possible, but it does not start or enable the service automatically.
 
 Common commands:
 
@@ -103,6 +105,8 @@ Meaning:
 - `systemctl --user start fungi.service`: start the daemon in the background now
 - `systemctl --user enable fungi.service`: start it automatically when your user logs in
 - `sudo loginctl enable-linger <user>`: keep the user service available after a real reboot, even before login
+
+Use `fungi-nightly.service` instead when you installed with `--version nightly`.
 
 More useful commands:
 
@@ -134,6 +138,12 @@ Install a specific version:
 
 ```bash
 curl -fsSL https://fungi.rs/install.sh | sh -s -- --version v0.6.0-preview
+```
+
+Install the nightly CLI as `fungi-nightly`:
+
+```bash
+curl -fsSL https://fungi.rs/install.sh | sh -s -- --version nightly
 ```
 
 Install to a custom directory:
