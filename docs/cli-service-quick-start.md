@@ -50,12 +50,12 @@ Options:
 
 Fungi CLI commands fall into four broad groups:
 
-| Category | Commands | Notes |
-|----------|----------|-------|
-| **Core Daemon Commands** | `init`, `daemon` | Initialize Fungi, start the daemon, and manage relay settings |
-| **WASI Runtime Commands** | `run`, `serve` | Re-exported wasmtime commands for WebAssembly modules |
-| **Daemon Management Commands** | `info`, `security` (`sec`), `tunnel` (`tn`), `service` (`svc`), `catalog`, `access`, `peer`, `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.** |
-| **Connection Diagnostics Commands** | `connection` (`conn`), `ping` | Observe active connections/streams and continuously measure peer RTT. **Require `fungi daemon` to be running first.** |
+| Category                            | Commands                                                                                              | Notes                                                                                                                 |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Core Daemon Commands**            | `init`, `daemon`                                                                                      | Initialize Fungi, start the daemon, and manage relay settings                                                         |
+| **WASI Runtime Commands**           | `run`, `serve`                                                                                        | Re-exported wasmtime commands for WebAssembly modules                                                                 |
+| **Daemon Management Commands**      | `info`, `security` (`sec`), `tunnel` (`tn`), `service` (`svc`), `catalog`, `access`, `peer`, `device` | Communicate with running daemon via gRPC. **Require `fungi daemon` to be running first.**                             |
+| **Connection Diagnostics Commands** | `connection` (`conn`), `ping`                                                                         | Observe active connections/streams and continuously measure peer RTT. **Require `fungi daemon` to be running first.** |
 
 ## Common Pattern
 
@@ -182,7 +182,7 @@ Use `service` for local service lifecycle management from service manifests.
 Common commands:
 
 ```bash
-fungi service pull ./my-service.yaml
+fungi service add ./my-service.yaml
 fungi service list
 fungi service start my-service
 fungi service inspect my-service
@@ -201,16 +201,16 @@ If you want to write your own manifest, continue with [Services And Runtimes](se
 
 ## Remote Peer Commands
 
-Use `peer admin service` when you want to control services on another node.
+Use `peer` for remote peer context and capability checks. Use `service` for the actual remote service lifecycle.
 
 Typical commands:
 
 ```bash
 fungi peer capability --peer <peer-id>
-fungi peer admin service pull --peer <peer-id> ./my-service.yaml
-fungi peer admin service list --peer <peer-id>
-fungi peer admin service start --peer <peer-id> my-service
-fungi peer admin service inspect --peer <peer-id> my-service
+fungi service add my-service@node-b ./my-service.yaml
+fungi service --device node-b list
+fungi service start my-service@node-b
+fungi service inspect my-service@node-b
 ```
 
 Use this group when:

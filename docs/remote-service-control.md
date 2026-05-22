@@ -4,11 +4,18 @@ sidebar_position: 5
 
 # Remote Service Control
 
-This guide shows how to use a few CLI commands to control a remote node, manage its services, and finally open a remote web app locally.
+This guide shows the current remote workflow:
 
-If you are not yet comfortable with manifests or runtime selection, read [Services And Runtimes](service-manifests) first, then come back here. If you want ready-to-download examples, use [Runtime Examples](runtime-examples).
+- check what a peer can run
+- add or start a service on that peer
+- browse what the peer publishes
+- open that published service locally
 
-Before starting, make sure the target peer already has a stable alias in your address book:
+If you are not yet comfortable with manifests or runtime selection, read [Services And Runtimes](service-manifests) first.
+
+## Set A Peer Alias First
+
+Before starting, make sure the target peer already has a stable alias:
 
 ```bash
 fungi device add <peer-id> --alias node-b
@@ -16,94 +23,102 @@ fungi peer use node-b
 fungi peer current
 ```
 
-Once `peer use` is set, later remote commands can omit `--peer`. Fungi prints the resolved target peer before each remote operation, so current-peer fallback stays visible.
+Once `peer use` is set, later commands can omit a repeated `--peer node-b` where the command supports peer context.
 
-## Group 1: `service` Through `peer admin`
+## 1. Check Runtime Capability
 
-Use `peer admin service` when you want to manage service instances on the remote node itself.
-
-Typical lifecycle:
+Before sending a manifest or recipe to another node, confirm what that node can run:
 
 ```bash
-fungi peer admin service pull --peer <peer-id> ./examples/service-manifests/filebrowser-lite-wasi.service.yaml
-fungi peer admin service list --peer <peer-id>
-fungi peer admin service start --peer <peer-id> filebrowser-lite-wasi
+fungi peer capability --peer node-b
 ```
 
-Useful checks:
+That tells you whether Docker and Wasmtime are available on the remote machine.
+
+## 2. Manage A Remote Service Instance
+
+Use `fungi service` to manage services on another node.
+
+Apply a local manifest file to the remote node:
 
 ```bash
-fungi peer capability --peer <peer-id>
-fungi peer admin service stop --peer <peer-id> filebrowser-lite-wasi
-fungi peer admin service remove --peer <peer-id> filebrowser-lite-wasi
+fungi service add my-service@node-b ./my-service.yaml
+fungi service start my-service@node-b
+fungi service inspect my-service@node-b
 ```
 
-Think of this group as the remote administrator view: pull, start, stop, and remove actual service instances on the other machine.
-
-## Group 2: `catalog`
-
-Use `catalog` when you want to browse what the remote node is publishing for consumption.
+List services already managed on that node:
 
 ```bash
-fungi catalog list --peer <peer-id>
-fungi catalog inspect --peer <peer-id> filebrowser-lite-wasi
+fungi service --device node-b list
 ```
 
-This is the consumer view, not the administrator view. It shows only services that the remote node has exposed for access.
-
-Typical questions answered by `catalog`:
-
-- What services is the remote peer publishing?
-- What `service_id` should I use locally?
-- Is this service meant to be used as a web app or another kind of endpoint?
-
-## Group 3: `access`
-
-Use `access` when you want to create or reuse a local entry point for a published remote service.
-
-Create a reusable local access entry:
+Stop or remove one:
 
 ```bash
-fungi access attach --peer <peer-id> filebrowser-lite-wasi
-fungi access list --peer <peer-id>
+fungi service stop my-service@node-b
+fungi service remove my-service@node-b
 ```
 
-Open the remote web app locally in one step:
+Apply an official recipe instead of a local manifest file:
 
 ```bash
-fungi access open --peer <peer-id> filebrowser-lite-wasi
+fungi service add --recipe filebrowser-lite filebrowser-lite@node-b
 ```
 
-`access open` reuses an existing local access entry when possible. If none exists, it creates one first and then opens the resulting local URL in your browser.
+Official recipes are resolved, applied, and started for you.
 
-Remove the local entry point when you no longer need it:
+## 3. Browse What The Peer Publishes
+
+A running service instance is not the same thing as a published service.
+
+Use `catalog` to inspect what the remote node is publishing for consumption:
 
 ```bash
-fungi access detach --peer <peer-id> filebrowser-lite-wasi
+fungi catalog list --peer node-b
+fungi catalog inspect --peer node-b filebrowser-lite
 ```
+
+Think of this as the consumer view of the remote node.
+
+## 4. Open The Published Service Locally
+
+Use `access` to create or reuse a local access entry for a published remote service:
+
+```bash
+fungi access open --peer node-b filebrowser-lite
+```
+
+Inspect or clean up those local entries:
+
+```bash
+fungi access list --peer node-b
+fungi access detach --peer node-b filebrowser-lite
+```
+
+`access open` creates access if needed and then opens the service in the appropriate local app when possible.
 
 ## Recommended Minimal Flow
 
-If you want the shortest end-to-end path, use this sequence:
+For the shortest end-to-end remote web app flow:
 
 ```bash
 fungi device add <peer-id> --alias node-b
-fungi peer admin service pull --peer <peer-id> ./examples/service-manifests/filebrowser-lite-wasi.service.yaml
-fungi peer admin service start --peer <peer-id> filebrowser-lite-wasi
-fungi catalog list --peer <peer-id>
-fungi access open --peer <peer-id> filebrowser-lite-wasi
+fungi peer capability --peer node-b
+fungi service add --recipe filebrowser-lite filebrowser-lite@node-b
+fungi catalog list --peer node-b
+fungi access open --peer node-b filebrowser-lite
 ```
 
 That gives you four layers of visibility:
 
-- `peer` confirms which node you are targeting
-- `service` manages the remote runtime instance
-- `catalog` shows what the remote node has exposed
-- `access` creates and opens the local entry point
+- `peer capability` answers what the remote node can run
+- `service` manages the actual remote service instance
+- `catalog` shows what the remote node publishes
+- `access` creates the local entry point you actually use
 
 ## Related Reading
 
-- [Fungi CLI Guide](cli-service-quick-start)
 - [Runtime Examples](runtime-examples)
 - [Services And Runtimes](service-manifests)
-- [Built-in WASI Support](wasi)
+- [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)

@@ -4,258 +4,303 @@ sidebar_position: 3
 
 # Services And Runtimes
 
-This page starts where [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app) ends.
+Fungi service manifests are the current packaging format for three kinds of services:
 
-You already saw how to run someone else's manifest. This guide shows the next step: write your own manifest, understand the fields while you write it, and run it with either the Docker-compatible runtime path or the built-in Wasmtime path.
+- Docker-backed services
+- Wasmtime-backed services
+- TCP tunnel services that point at an already-running local port
 
-The goal is practical:
+This page is the current schema guide. It matches the manifest format that Fungi parses today and the CLI surface that ships today.
 
-- create one Docker manifest by hand
-- create one Wasmtime manifest by hand
-- understand which fields matter and which ones you can ignore at first
-- keep the whole flow simple enough that you can finish it in a few minutes
+If you only want ready-made examples, use [Runtime Examples](runtime-examples). The default recommendation is still to apply official recipes directly with `fungi service add --recipe <id>`.
 
-If you only want direct downloads of the built-in examples, use [Runtime Examples](runtime-examples).
+## Current Lifecycle
 
-## What A Manifest Does
-
-Every Fungi service manifest answers four questions:
-
-- what runtime should execute the service
-- where the service artifact comes from
-- which ports and host paths the service needs
-- how the service should be published through `spec.expose`
-
-Today Fungi ships two runtime paths:
-
-- `runtime: docker` for OCI-style container images
-- `runtime: wasmtime` for `wasi-http` style WebAssembly components
-
-The control flow stays almost the same for both runtimes:
+For a local manifest file, the current recommended flow is:
 
 ```bash
-fungi service pull ./my-service.yaml
+fungi service add ./my-service.yaml
 fungi service start my-service
 fungi service inspect my-service
 ```
 
-Or on a remote peer:
+For a remote node, use a service reference that includes the device:
 
 ```bash
-fungi peer admin service pull --peer <peer-id> ./my-service.yaml
-fungi peer admin service start --peer <peer-id> my-service
-fungi access open --peer <peer-id> my-service
+fungi service add my-service@node-b ./my-service.yaml
+fungi service start my-service@node-b
+fungi access open --peer node-b my-service
 ```
 
-## Start From A Blank Template
+A few important notes:
 
-Create a new YAML file locally and paste this skeleton first:
+- `fungi service add ./my-service.yaml` applies the manifest and records the service, but it does not automatically start a manifest loaded from a local file.
+- `fungi service add --recipe <id>` is different. Official recipes are resolved, applied, and then started for you.
+- `fungi access open` is for published remote services. For a local web service, use `fungi service open my-service` when the service advertises a browser-friendly entry.
+
+## Current Manifest Shape
+
+A service manifest always starts with the same document header:
 
 ```yaml
-apiVersion: fungi.dev/v1alpha1
-kind: ServiceManifest
+apiVersion: fungi.rs/v1alpha1
+kind: Service
+```
+
+After that, the meaning depends on `spec.run`:
+
+- `spec.run.docker` means Docker runtime
+- `spec.run.wasmtime` means Wasmtime runtime
+- no `spec.run` means a TCP tunnel service, also called the `link` runtime in the implementation
+
+Start from this current template:
+
+```yaml
+apiVersion: fungi.rs/v1alpha1
+kind: Service
 
 metadata:
-  # Service instance name inside Fungi.
   name: your-service-name
 
 spec:
-  # Allowed values: docker, wasmtime.
-  runtime: docker
+  run:
+    docker:
+      image: nginx:stable-alpine
+    # wasmtime:
+    #   file: ./component.wasm
+    #   url: https://example.com/component.wasm
 
-  expose:
-    # Set enabled: true when you want catalog/access workflows.
-    enabled: true
-    # Usually keep this aligned with metadata.name at first.
-    serviceId: your-service-name
-    displayName: Your Service
-    transport:
-      # Allowed values: tcp, raw.
-      kind: tcp
-    usage:
-      # Allowed values: web, ssh, raw.
-      kind: web
+  entries:
+    http:
+      port: 8080
+      hostPort: 18080
+      usage: web
       path: /
+      # iconUrl: https://example.com/icon.svg
+      # catalogId: io.example.service
 
-  source:
-    # Docker uses image.
-    image: nginx:stable-alpine
-    # Wasmtime uses exactly one of file or url instead.
-    # file: ./your-component.wasm
-    # url: https://example.com/your-component.wasm
-
-  ports:
-    - # Allowed values for hostPort: auto or a fixed port number.
-      hostPort: auto
-      # Required for expose.enabled=true with tcp transport.
-      name: http
-      servicePort: 80
-      # Allowed values: tcp, udp.
-      protocol: tcp
-
-  # Optional host mounts.
-  mounts: []
-
-  # Optional environment variables.
   env: {}
 
-  # Optional overrides. Leave empty at first.
+  mounts: []
+
   command: []
+
   entrypoint: []
+
   workingDir: null
 ```
 
-You do not need every field on day one. For a minimal first service, focus on:
-
-- `metadata.name`
-- `spec.runtime`
-- `spec.source`
-- `spec.ports`
-- `spec.expose`
-
-## Example 1: Write A Docker Manifest For Nginx
-
-Before writing the Docker example, confirm the target node actually has Docker support available:
-
-```bash
-fungi info runtime
-# or, for a remote node
-fungi peer capability --peer <peer-id>
-```
-
-If Docker is not available on that node, install Docker first and restart `fungi daemon`, or skip this example. 
-
-Create `my-nginx.service.yaml` and paste this:
+For a TCP tunnel service, remove `spec.run` and use `target` instead of `port`:
 
 ```yaml
-apiVersion: fungi.dev/v1alpha1
-kind: ServiceManifest
+apiVersion: fungi.rs/v1alpha1
+kind: Service
+
+metadata:
+  name: ssh-tunnel
+
+spec:
+  entries:
+    ssh:
+      target: 127.0.0.1:22
+      usage: ssh
+```
+
+## Runtime Model
+
+Fungi uses one shared manifest format, but it is not fully runtime-transparent.
+
+That distinction matters most for `command`, `entrypoint`, and `workingDir`.
+
+| Field                        | Docker                       | Wasmtime                          | Link / TCP tunnel |
+| ---------------------------- | ---------------------------- | --------------------------------- | ----------------- |
+| `spec.run`                   | `docker.image`               | `wasmtime.file` or `wasmtime.url` | omitted           |
+| `spec.entries.<name>.port`   | required                     | required                          | invalid           |
+| `spec.entries.<name>.target` | invalid                      | invalid                           | required          |
+| `spec.env`                   | passed to container env      | passed to child process env       | rejected          |
+| `spec.mounts`                | bind mounts                  | `--dir` mappings                  | rejected          |
+| `spec.command`               | Docker `Cmd`                 | argv after the component path     | rejected          |
+| `spec.entrypoint`            | Docker `Entrypoint` override | rejected                          | rejected          |
+| `spec.workingDir`            | Docker `WorkingDir`          | child process current directory   | rejected          |
+
+This is the practical rule set:
+
+- `command` is a shared field name, not a shared runtime abstraction.
+- `entrypoint` is Docker-only by design.
+- `workingDir` is available for Docker and Wasmtime, but it still maps to different execution models.
+- TCP tunnel services do not launch a process, so process-oriented fields are rejected.
+
+## `entries` Drives Publication
+
+`spec.entries` is the center of the current schema.
+
+For runnable services, each entry describes:
+
+- the runtime port with `port`
+- the optional fixed host port with `hostPort`
+- how Fungi should treat the endpoint with `usage`
+- optional publication metadata such as `path`, `iconUrl`, and `catalogId`
+
+Example:
+
+```yaml
+entries:
+  http:
+    port: 8080
+    usage: web
+    path: /
+```
+
+For TCP tunnel services, `entries` describes the existing local target instead:
+
+```yaml
+entries:
+  ssh:
+    target: 127.0.0.1:22
+    usage: ssh
+```
+
+Current limits worth knowing:
+
+- TCP tunnel manifests currently support exactly one entry.
+- If you set publication metadata such as `usage`, `path`, `iconUrl`, or `catalogId` on multiple entries, they must match. Per-entry publish metadata is not supported yet.
+- `protocol` currently supports only `tcp`.
+
+## Docker Example
+
+A minimal Docker manifest under the current schema looks like this:
+
+```yaml
+apiVersion: fungi.rs/v1alpha1
+kind: Service
 
 metadata:
   name: my-nginx
 
 spec:
-  # Allowed values: docker, wasmtime.
-  runtime: docker
+  run:
+    docker:
+      image: nginx:stable-alpine
 
-  expose:
-    enabled: true
-    serviceId: my-nginx
-    displayName: My Nginx
-    transport:
-      # Allowed values: tcp, raw.
-      kind: tcp
-    usage:
-      # Allowed values: web, ssh, raw.
-      kind: web
+  entries:
+    http:
+      port: 80
+      usage: web
       path: /
-
-  source:
-    image: nginx:stable-alpine
-
-  ports:
-    - # Allowed values for hostPort: auto or a fixed port number.
-      hostPort: auto
-      name: http
-      servicePort: 80
-      # Allowed values: tcp, udp.
-      protocol: tcp
-
-  mounts: []
-  env: {}
 ```
 
-What each important field means here:
-
-- `runtime: docker` tells Fungi to use the Docker-compatible container runtime path
-- `source.image` is the image reference Fungi should pull if it is missing
-- `hostPort: auto` asks the target node to allocate a permitted host port for you
-- `name: http` is important because exposed TCP services need at least one named TCP port
-- `usage.kind: web` plus `path: /` tells Fungi this endpoint should be treated like a web app
-
-Run it locally:
+Apply it locally:
 
 ```bash
-fungi service pull ./my-nginx.service.yaml
+fungi service add ./my-nginx.yaml
 fungi service start my-nginx
-fungi service inspect my-nginx
+fungi service open my-nginx
 ```
 
-Copy the `local_endpoints.local_address` address in your browser and you should see the default Nginx welcome page.
+What this means:
 
-If you want to see logs:
+- Fungi creates a managed Docker container
+- it maps one host port to container port `80`
+- it records publication metadata so `service open` and remote access workflows know this is a web app
 
-```bash
-fungi service logs my-nginx --tail 50
-```
+## Wasmtime Example
 
-## Example 2: Write A Wasmtime Manifest For A Local `.wasm`
-
-Fungi's Wasmtime path supports both of these source forms:
-
-- `spec.source.file` for a local `.wasm` file
-- `spec.source.url` for a direct HTTP or HTTPS URL to a single `.wasm` file
-
-We use the `sample-wasi-http-rust` project in this example. 
-Get a `sample-wasi-http-rust.wasm` file from [bytecodealliance/sample-wasi-http-rust](https://github.com/bytecodealliance/sample-wasi-http-rust), then put that `.wasm` file in the same directory as this YAML file.
-
-Create `sample-wasi-http.service.yaml`:
+A minimal Wasmtime manifest under the current schema looks like this:
 
 ```yaml
-apiVersion: fungi.dev/v1alpha1
-kind: ServiceManifest
+apiVersion: fungi.rs/v1alpha1
+kind: Service
 
 metadata:
   name: sample-wasi-http
 
 spec:
-  # Allowed values: docker, wasmtime.
-  runtime: wasmtime
+  run:
+    wasmtime:
+      file: ./sample-wasi-http-rust.wasm
 
-  expose:
-    enabled: true
-    serviceId: sample-wasi-http
-    displayName: Sample WASI HTTP
-    transport:
-      # Allowed values: tcp, raw.
-      kind: tcp
-    usage:
-      # Allowed values: web, ssh, raw.
-      kind: web
+  entries:
+    http:
+      port: 8080
+      usage: web
       path: /
-
-  source:
-    file: ./sample-wasi-http-rust.wasm
-
-  ports:
-    - # Allowed values for hostPort: auto or a fixed port number.
-      hostPort: auto
-      name: http
-      servicePort: 8080
-      # Allowed values: tcp, udp.
-      protocol: tcp
-
-  mounts: []
-  env: {}
 ```
 
-Run it locally:
+Apply it locally:
 
 ```bash
-fungi service pull ./sample-wasi-http.service.yaml
+fungi service add ./sample-wasi-http.yaml
 fungi service start sample-wasi-http
-fungi service inspect sample-wasi-http
+fungi service open sample-wasi-http
 ```
 
-Copy the `local_endpoints.local_address` address in your browser and you should see the `Hello, wasi:http/proxy world!` page.
+For remote targets, prefer `spec.run.wasmtime.url` unless the target node already has the artifact at a stable local path.
 
-For this local example, keep the `.wasm` file next to the YAML file and use a relative path like `./sample-wasi-http-rust.wasm`.
+## TCP Tunnel Example
 
-For remote deployment, do not start with `spec.source.file`. Prefer `spec.source.url` first.
+A tunnel manifest points at an existing process on the target node. Fungi does not launch that process.
 
-## Mounts, `${APP_HOME}`, And Working Directories
+```yaml
+apiVersion: fungi.rs/v1alpha1
+kind: Service
 
-Mounts are optional. When you do need one, start with `${APP_HOME}`.
+metadata:
+  name: ssh-tunnel
+
+spec:
+  entries:
+    ssh:
+      target: 127.0.0.1:22
+      usage: ssh
+```
+
+Apply it locally:
+
+```bash
+fungi service add ./ssh-tunnel.yaml
+fungi service start ssh-tunnel
+fungi service inspect ssh-tunnel
+```
+
+A tunnel service is still managed as a named Fungi service instance, but the runtime is just a structured reference to an existing TCP endpoint.
+
+## `command`, `entrypoint`, And `workingDir`
+
+These three fields deserve special treatment.
+
+`spec.command`
+
+- Docker: mapped to Docker `Cmd`
+- Wasmtime: appended after the component path when Fungi launches the Wasmtime child process
+- Link: rejected
+
+`spec.entrypoint`
+
+- Docker only
+- useful when you need to override the image entrypoint entirely
+- rejected for Wasmtime and TCP tunnel services
+
+`spec.workingDir`
+
+- Docker: becomes Docker `WorkingDir`
+- Wasmtime: becomes the current working directory of the child process Fungi launches
+- Link: rejected
+
+One concrete implication: a Docker `command` override only works if the image entrypoint and application actually accept those arguments.
+
+If an image already bakes important arguments into its entrypoint, keep that in mind before duplicating them in `spec.command`.
+
+## Mounts And Host Path Variables
+
+Current recipes commonly use `${USER_HOME}` for user-facing data and `${APP_HOME}` for service-specific storage.
+
+Example:
+
+```yaml
+mounts:
+  - hostPath: ${USER_HOME}
+    runtimePath: data
+```
 
 Example:
 
@@ -265,91 +310,37 @@ mounts:
     runtimePath: data
 ```
 
-That means:
+Practical rules:
 
-- `${APP_HOME}` resolves on the target node to `fungi_home/services/<service-name>`
-- Fungi creates the mount directory automatically before launch
-- for Wasmtime, `runtimePath: data` becomes a guest directory exposed as `data`
+- Fungi resolves these host paths on the target node
+- host mount directories are created automatically before launch
+- mount policy still applies on the target node
+- for Wasmtime, the guest path is exposed through the launcher `--dir` mapping
 
-Use this pattern when you want a service-specific persistent directory without hard-coding host paths.
+## Official Recipes
 
-`workingDir` is optional. If you do not set it, Fungi uses the runtime service directory it prepared for that service.
+Before writing from scratch, inspect the current official recipes:
 
-## The Fields You Will Use Most Often
+- `code-server` for Docker with a command override
+- `filebrowser-lite` for Wasmtime with a remote artifact URL
+- `webdav` for Wasmtime with a TCP-style usage hint
+- `ssh-tunnel` for a link/TCP tunnel manifest
 
-`metadata.name`
-
-- the Fungi service instance name
-- used by `fungi service start <name>` and related commands
-- also affects `${APP_HOME}`
-
-`spec.runtime`
-
-- `docker` or `wasmtime`
-- this decides which source fields are valid
-
-`spec.source`
-
-- Docker: `image`
-- Wasmtime: exactly one of `file` or `url`
-- `file` should point to a single local `.wasm` file
-- `url` should be a direct HTTP or HTTPS URL to a single `.wasm` file
-
-`spec.ports`
-
-- `servicePort` is the port the app listens on inside its runtime
-- `hostPort: auto` is usually the easiest starting point
-- `name` should be present for exposed TCP services
-
-`spec.expose`
-
-- tells Fungi how to publish the service to catalog/access workflows
-- keep `serviceId` stable once other nodes depend on it
-- `usage.kind: web` is the common case for browser-facing apps
-
-`spec.mounts`
-
-- maps host paths into the workload
-- host paths still have to pass the target node's runtime safety policy
-
-## Local Flow Vs Remote Flow
-
-Use the local flow when you are still designing the manifest itself:
+Use:
 
 ```bash
-fungi service pull ./my-service.yaml
-fungi service start my-service
-fungi service inspect my-service
-fungi service logs my-service --tail 50
+fungi service recipe list
+fungi service recipe show code-server
+fungi service add --recipe code-server
 ```
 
-Use the remote flow once the manifest already works locally:
+If you need the raw manifest instead of applying the recipe directly:
 
-```bash
-fungi peer capability --peer <peer-id>
-fungi peer admin service pull --peer <peer-id> ./my-service.yaml
-fungi peer admin service start --peer <peer-id> my-service
-fungi access open --peer <peer-id> my-service
-```
+- download the release asset from `fungi-service-recipes`
+- or clone the `fungi-service-recipes` repository and edit `recipes/<id>/manifest.yaml` locally
 
-## Runtime Notes
+## Related Reading
 
-- The Docker-compatible runtime path targets host Docker endpoints on Windows, macOS, and Linux.
-- On Windows, the common endpoint is `\\.\pipe\docker_engine`; on macOS it is often `$HOME/.docker/run/docker.sock`; on Linux it is often `/var/run/docker.sock`.
-- The container path automatically pulls the referenced image if it is missing locally.
-- The Wasmtime path supports a local `.wasm` file or a direct HTTP/HTTPS URL to a single `.wasm` file.
-- Wasmtime mount directories are created automatically before launch.
-- The Wasmtime path is not available on Android yet.
-- `spec.expose.enabled=true` with TCP transport requires at least one named TCP port in `spec.ports[].name`.
-
-## Current Limits
-
-- Archive packages and hash verification are not implemented yet.
-- The Wasmtime path currently targets single-component `.wasm` payloads rather than richer package formats.
-- Container image pull progress is not yet streamed through the CLI.
-
-## Continue Reading
-
-- [Runtime Examples](runtime-examples): direct downloads of the built-in example manifests.
-- [Remote Service Control](remote-service-control): the user-facing `peer`, `catalog`, and `access` flow.
-- [2-Minute Quick Start: Forward A TCP Port](/docs/quick-start/tcp-tunnel): the shortest path for raw TCP forwarding after your devices are already connected.
+- [Runtime Examples](runtime-examples)
+- [Remote Service Control](remote-service-control)
+- [2-Minute Quick Start: Run a Remote Sandbox App Locally](/docs/quick-start/remote-sandbox-app)
