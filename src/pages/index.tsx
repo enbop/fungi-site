@@ -9,53 +9,49 @@ import styles from "./index.module.css";
 
 const pillars = [
   {
-    title: "Private Device Mesh",
-    body: "Connect your own machines through an encrypted peer-to-peer network without depending on a hosted control plane.",
+    title: "Devices",
+    body: "Connect your devices over encrypted links, directly when possible or through a relay when needed. Only devices you approve can initiate access.",
   },
   {
-    title: "Capability-First Services",
-    body: "Run container and WASI workloads under explicit runtime, path, and port policy instead of broad daemon privileges.",
+    title: "Sandboxed Apps",
+    body: "Run portable WebAssembly apps in the built-in Wasmtime sandbox, or use an optional constrained Docker backend.",
   },
   {
-    title: "Remote Control From Local CLI",
-    body: "Target a remote peer, manage its services, inspect its catalog, and open its published web app locally with a small command set.",
+    title: "Easy Access",
+    body: "Access services across your device network without exposing them to the public internet.",
+  },
+];
+
+const demos = [
+  {
+    title: "Connect a device",
+    image: "/img/fungi-ping-dark.gif",
+    alt: "Fungi ping connects to a saved device",
+    href: "/docs/quick-start/connect-devices",
+  },
+  {
+    title: "Open an app from another device",
+    image: "/img/fungi-filebrowser-dark.gif",
+    alt: "Fungi opens a file browser service from another device on localhost",
+    href: "/docs/quick-start/use-service",
   },
 ];
 
 const workflow = [
   {
-    label: "Service",
-    command:
-      "fungi peer admin service start --peer <peer-id> filebrowser-lite-wasi",
-    body: "Start the remote service.",
-  },
-  {
-    label: "Catalog",
-    command: "fungi catalog list --peer <peer-id>",
-    body: "See what that peer publishes.",
-  },
-  {
-    label: "Access",
-    command: "fungi access open --peer <peer-id> filebrowser-lite-wasi",
-    body: "Open the web app locally.",
-  },
-];
-
-const heroSteps = [
-  {
-    label: "Daemon",
-    command: "fungi daemon",
-    body: "Start the local daemon.",
+    label: "Save",
+    command: "fungi device add my-mac <device-id>",
+    body: "Give another device a local name.",
   },
   {
     label: "Trust",
-    command: "fungi security allowed-peers add <alias>",
-    body: "Allow only your own device.",
+    command: "fungi device trust my-mac",
+    body: "Allow the saved device to make Fungi service requests.",
   },
   {
     label: "Open",
-    command: "fungi access open --peer <peer-id> filebrowser-lite-wasi",
-    body: "Open a remote app locally.",
+    command: "fungi files@my-mac",
+    body: "Open a service from the current device.",
   },
 ];
 
@@ -63,29 +59,29 @@ const docs = [
   {
     title: "Install Fungi",
     href: "/docs/install",
-    body: "One-line install for macOS and Linux, plus GitHub Releases, Windows, source build, and Linux systemd notes.",
+    body: "Install the CLI, start the daemon, and update safely.",
   },
   {
-    title: "3 Minutes: Build Your Private P2P Network",
-    href: "/docs/quick-start/private-p2p-network",
-    body: "Connect two of your own devices, trust them safely, and verify the link with ping.",
+    title: "Connect Two Devices",
+    href: "/docs/quick-start/connect-devices",
+    body: "Save another device, trust it, and verify the encrypted link.",
   },
   {
-    title: "2 Minutes: Run A Remote Sandbox App",
-    href: "/docs/quick-start/remote-sandbox-app",
-    body: "Start a sandboxed app on one device and open it locally from another device.",
+    title: "Use A Service",
+    href: "/docs/quick-start/use-service",
+    body: "Run an app on one device and open it locally from another.",
   },
   {
-    title: "Reference Docs",
-    href: "/docs/intro",
-    body: "Dive into manifests, remote control, diagnostics, gRPC, relay setup, and runtime details.",
+    title: "Upgrade To 0.7",
+    href: "/docs/upgrade-0.7",
+    body: "Move from legacy peer and tunnel workflows to devices and services.",
   },
 ];
 
 const bottomActions = [
   {
-    label: "Full install guide",
-    href: "/docs/install",
+    label: "Read the docs",
+    href: "/docs/intro",
     kind: "primary",
   },
   {
@@ -118,17 +114,18 @@ function HomepageHeader() {
         <div className={styles.heroShell}>
           <div className={styles.heroCopy}>
             <div className={styles.badges}>
-              <span className={styles.badge}>Private P2P</span>
-              <span className={styles.badge}>Capability-First</span>
-              <span className={styles.badge}>Container + WASI</span>
+              <span className={styles.badge}>Encrypted links</span>
+              <span className={styles.badge}>Sandboxed apps</span>
+              <span className={styles.badge}>Private access</span>
             </div>
             <Heading as="h1" className={styles.heroTitle}>
               {siteConfig.title}
             </Heading>
             <p className={styles.heroTagline}>{siteConfig.tagline}</p>
             <p className={styles.heroDescription}>
-              Build your own encrypted device mesh, run services under explicit
-              runtime policy, and control remote nodes from a local CLI or GUI.
+              Fungi connects your trusted devices and runs apps as sandboxed
+              services. Access those services locally from another device
+              without opening public ports.
             </p>
             <div className={styles.installCallout}>
               <p className={styles.installLabel}>macOS / Linux quick install</p>
@@ -147,30 +144,34 @@ function HomepageHeader() {
             </div>
             <div className={styles.buttons}>
               <Link className={styles.primaryButton} to="/docs/install">
-                Full install guide
+                Install
               </Link>
               <Link
                 className={styles.secondaryButton}
-                to="/docs/quick-start/private-p2p-network"
+                to="/docs/quick-start/connect-devices"
               >
                 Quick Start
               </Link>
               <Link
                 className={styles.secondaryButton}
-                to="https://github.com/enbop/fungi-app/releases/latest"
+                to="https://github.com/enbop/fungi"
               >
-                Download Fungi App (GUI)
+                GitHub
               </Link>
             </div>
           </div>
-          <div className={styles.heroPanel}>
-            <p className={styles.panelLabel}>Basic Flow</p>
-            {heroSteps.map((item) => (
-              <div key={item.label} className={styles.panelBlock}>
-                <span className={styles.panelGroup}>{item.label}</span>
-                <code className={styles.panelCode}>{item.command}</code>
-                <p className={styles.panelText}>{item.body}</p>
-              </div>
+          <div className={styles.heroDemos}>
+            {demos.map((item) => (
+              <Link
+                key={item.title}
+                className={styles.heroDemoLink}
+                to={item.href}
+              >
+                <figure className={styles.heroDemo}>
+                  <img src={item.image} alt={item.alt} />
+                  <figcaption>{item.title}</figcaption>
+                </figure>
+              </Link>
             ))}
           </div>
         </div>
@@ -181,22 +182,23 @@ function HomepageHeader() {
 
 export default function Home(): ReactNode {
   const { siteConfig } = useDocusaurusContext();
+
   return (
     <Layout
-      title={`${siteConfig.title}`}
-      description="Build a private P2P device network for capability-first container and WASI services."
+      title={siteConfig.title}
+      description="Fungi turns your devices into a personal app platform. Run apps on any device, and access them securely from anywhere."
     >
       <HomepageHeader />
       <main>
-        <section className={styles.section}>
+        <section className={styles.sectionAlt}>
           <div className="container">
             <div className={styles.sectionHeader}>
-              <p className={styles.eyebrow}>Why Fungi</p>
+              <p className={styles.eyebrow}>Personal App Platform</p>
               <Heading as="h2" className={styles.sectionTitle}>
-                Focused on private infrastructure, not generic sync features
+                Built around devices, sandboxed apps, and private access
               </Heading>
             </div>
-            <div className={styles.cardGrid}>
+            <div className={styles.pillarGrid}>
               {pillars.map((item) => (
                 <article key={item.title} className={styles.infoCard}>
                   <Heading as="h3" className={styles.cardTitle}>
@@ -209,12 +211,12 @@ export default function Home(): ReactNode {
           </div>
         </section>
 
-        <section className={styles.sectionAlt}>
+        <section className={styles.section}>
           <div className="container">
             <div className={styles.sectionHeader}>
-              <p className={styles.eyebrow}>Three Command Groups</p>
+              <p className={styles.eyebrow}>Workflow</p>
               <Heading as="h2" className={styles.sectionTitle}>
-                Remote workflow: Service, Catalog, Access
+                Save a device, trust it, open a service
               </Heading>
             </div>
             <div className={styles.workflowGrid}>
@@ -229,12 +231,12 @@ export default function Home(): ReactNode {
           </div>
         </section>
 
-        <section className={styles.section}>
+        <section className={styles.sectionAlt}>
           <div className="container">
             <div className={styles.sectionHeader}>
               <p className={styles.eyebrow}>Start Here</p>
               <Heading as="h2" className={styles.sectionTitle}>
-                Install first, then move through quick starts and references
+                Install first, then connect devices and use a service
               </Heading>
             </div>
             <div className={styles.cardGrid}>
@@ -251,44 +253,19 @@ export default function Home(): ReactNode {
                 </Link>
               ))}
             </div>
-            <aside className={styles.deprecatedCallout}>
-              <p className={styles.deprecatedLabel}>Deprecated</p>
-              <Heading as="h3" className={styles.deprecatedTitle}>
-                File transfer is being phased out
-              </Heading>
-              <p>
-                The old FTP and WebDAV-based file workflow will be removed over
-                the next few releases. Existing usage notes remain available,
-                but new setups should use services instead.
-              </p>
-              <div className={styles.calloutLinks}>
-                <Link
-                  className={styles.inlineLink}
-                  to="/docs/deprecated-file-transfer"
-                >
-                  View deprecated file transfer guide
-                </Link>
-                <Link
-                  className={styles.inlineLink}
-                  to="/docs/remote-service-control"
-                >
-                  Go to service-based remote control guide
-                </Link>
-              </div>
-            </aside>
           </div>
         </section>
 
-        <section className={styles.sectionAlt}>
+        <section className={styles.section}>
           <div className="container">
             <div className={styles.bottomCta}>
-              <p className={styles.eyebrow}>Get Started</p>
+              <p className={styles.eyebrow}>Next</p>
               <Heading as="h2" className={styles.sectionTitle}>
-                Install Fungi, then join the community if you get stuck
+                Build your personal app platform one step at a time
               </Heading>
               <p className={styles.bottomCtaText}>
-                Start with the install guide, or jump into Discord for release
-                updates, questions, and feedback.
+                Start with two devices and one service. Fungi keeps the network,
+                trust, and local access behind a small set of commands.
               </p>
               <div className={styles.bottomCtaActions}>
                 {bottomActions.map((item) => (

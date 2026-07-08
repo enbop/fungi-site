@@ -6,7 +6,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
   title: "Fungi",
-  tagline: "Build a private P2P device network for capability-first services.",
+  tagline: "Run apps on any device, and access them securely from anywhere.",
   favicon: "img/favicon.ico",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -109,6 +109,10 @@ const config: Config = {
             {
               label: "Install",
               to: "/docs/install",
+            },
+            {
+              label: "Connect Devices",
+              to: "/docs/quick-start/connect-devices",
             },
             {
               label: "Docs",

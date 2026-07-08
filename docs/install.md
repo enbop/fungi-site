@@ -20,7 +20,21 @@ With no version specified, the script installs the latest stable release.
 
 You can inspect the script first at [https://fungi.rs/install.sh](https://fungi.rs/install.sh).
 
-On macOS, we recommend installing the Fungi App GUI through our Homebrew tap:
+On macOS, you can also install the CLI from Homebrew:
+
+```bash
+brew tap enbop/fungi
+brew install fungi
+```
+
+Or install the nightly CLI:
+
+```bash
+brew tap enbop/fungi
+brew install fungi-nightly
+```
+
+For the Fungi App GUI:
 
 ```bash
 brew tap enbop/fungi
@@ -137,7 +151,7 @@ If `fungi daemon` is already running, restart the daemon after updating so the r
 Install a specific version:
 
 ```bash
-curl -fsSL https://fungi.rs/install.sh | sh -s -- --version v0.6.0-preview
+curl -fsSL https://fungi.rs/install.sh | sh -s -- --version v0.7.0
 ```
 
 Install the nightly CLI as `fungi-nightly`:

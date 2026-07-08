@@ -1,74 +1,68 @@
-# gRPC Guide
-Starting from version 0.4.0, the Fungi daemon uses gRPC for inter-process communication. 
-Both fungi-cli and fungi-app (GUI) communicate with the Fungi daemon through gRPC.
+---
+title: gRPC API
+description: Integrate with the local Fungi daemon over gRPC.
+sidebar_position: 10
+slug: /grpc-guide
+---
 
-You can also use any gRPC client to interact with the Fungi daemon.
+# gRPC API
 
-Need binaries first? Start at [Install Fungi](/docs/install).
+Fungi CLI and Fungi App both control the local daemon through gRPC. Custom tools can use the same API.
 
-### gRPC Server Address
-By default, the Fungi daemon starts a gRPC server listening on `127.0.0.1:5405`.
-You can change the listening address in the configuration file `~/.fungi/config.toml`:
+## Server Address
 
-```toml
-[rpc]
-listen_address = "127.0.0.1:5405"
+By default, the daemon listens on:
+
+```text
+127.0.0.1:5405
 ```
 
-(Restart the Fungi daemon to apply changes)
+Print the active address:
 
-### gRPC Service Definition
-The gRPC service definition is available in the Fungi repository: 
+```bash
+fungi info rpc-address
+```
+
+If you edit the daemon config directly, restart the daemon afterwards.
+
+## Proto File
+
+The service definition lives in the Fungi repository:
+
 [fungi_daemon.proto](https://github.com/enbop/fungi/blob/master/crates/daemon-grpc/proto/fungi_daemon.proto)
 
-You can also download it from the [latest release](https://github.com/enbop/fungi/releases/latest/download/fungi_daemon.proto).
+Release builds may also publish a copy with release assets.
 
+## Explore With grpcurl
 
-### Using gRPC Client
-You can use any gRPC client to interact with the Fungi daemon. Here is an example using the `grpcurl` command-line tool.
-
-
-#### Start Fungi Daemon
-
-Run the Fungi App GUI or use the CLI command `fungi daemon` to start the Fungi daemon.
-
-If you use a custom config directory, pass `-f` before the command:
+Start the daemon:
 
 ```bash
-fungi -f /path/to/fungi daemon
+fungi daemon
 ```
 
-
-#### Download `fungi_daemon.proto`
-
-```bash
-wget https://github.com/enbop/fungi/releases/latest/download/fungi_daemon.proto
-```
-
-#### List Services
+List methods:
 
 ```bash
-grpcurl -proto fungi_daemon.proto list fungi_daemon.FungiDaemon
-```
-output:
-```
-fungi_daemon.FungiDaemon.AddFileTransferClient
-fungi_daemon.FungiDaemon.AddIncomingAllowedPeer
-fungi_daemon.FungiDaemon.AddTcpForwardingRule
-fungi_daemon.FungiDaemon.AddTcpListeningRule
-fungi_daemon.FungiDaemon.ConfigFilePath
-...
+grpcurl -plaintext -proto fungi_daemon.proto 127.0.0.1:5405 list fungi_daemon.FungiDaemon
 ```
 
-#### Call Methods
-Show the peer ID of this device:
+Call a simple method:
+
 ```bash
-grpcurl -proto fungi_daemon.proto -plaintext 127.0.0.1:5405 fungi_daemon.FungiDaemon/PeerId
+grpcurl -plaintext -proto fungi_daemon.proto 127.0.0.1:5405 fungi_daemon.FungiDaemon/Version
 ```
 
-Output:
-```json
-{
-  "peerId": "16Uiu2...."
-}
-```
+## Current API Shape
+
+The user-facing API follows the same device and service model as the CLI:
+
+- device discovery and saved devices
+- trusted devices
+- local and remote services
+- service recipes
+- device service snapshots
+- service access listeners
+- relay configuration and connection diagnostics
+
+Low-level protobuf field names may still use `peer_id` where the underlying libp2p identity is exposed.

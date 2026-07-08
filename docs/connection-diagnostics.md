@@ -1,35 +1,24 @@
+---
+title: Connection Diagnostics
+description: Inspect active connections, streams, relay status, and ping behavior.
+sidebar_position: 8
+slug: /connection-diagnostics
+---
+
 # Connection Diagnostics
 
-This guide explains how to observe active connections and verify peer connectivity using Fungi CLI.
+Use these commands when a device or service should be reachable but is not behaving as expected.
 
-> Prerequisite: `fungi daemon` must be running.
->
-> Need binaries first? Start at [Install Fungi](/docs/install).
+The daemon must be running.
 
-## Why This Matters
-
-When file transfer or tunneling behaves unexpectedly, these commands help you quickly answer:
-
-- Is the peer currently connected?
-- Are streams being created on expected protocols?
-- Is latency stable across active links?
-
-## Commands
-
-Fungi provides two diagnostics entry points:
-
-- `fungi connection` (alias: `fungi conn`) for connection and stream snapshots
-- `fungi ping <peer_id>` for continuous RTT checks on active links
-
-## Inspect Active Connections
-
-Show an overview of active connections:
+## Overview
 
 ```bash
+fungi connection overview
 fungi conn overview
 ```
 
-Filter by peer:
+Filter by low-level device identity:
 
 ```bash
 fungi conn overview --peer-id 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -38,72 +27,68 @@ fungi conn overview --peer-id 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Filter by protocol:
 
 ```bash
-fungi conn overview --protocol-name /fungi/tunnel/8080/1.0.0
+fungi conn overview --protocol-name /fungi/service/web/main/0.2.0
 ```
 
-Use verbose output:
+Verbose output includes policy and per-protocol stream details:
 
 ```bash
 fungi conn overview --verbose
 ```
 
-## Inspect Active Streams
-
-List active streams:
+## Streams
 
 ```bash
 fungi conn streams
-```
-
-Filter options are the same as `overview`:
-
-```bash
 fungi conn streams --peer-id 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-fungi conn streams --protocol-name /fungi/tunnel/8080/1.0.0
+fungi conn streams --protocol-name /fungi/service/web/main/0.2.0
 fungi conn streams --verbose
 ```
 
-## Inspect Relay Status
-
-List configured relay endpoints and their current health:
+## Relay Status
 
 ```bash
 fungi conn relay-status
+fungi conn relay-status --verbose
 ```
 
-In relay status output, TCP endpoints should be the stable reservation/circuit carriers. UDP/QUIC endpoints may appear without a relay listener because Fungi uses them only as observer endpoints for UDP address refresh before hole punching.
+Relay candidates are grouped by relay device. Fungi tries UDP/QUIC first and falls back to TCP for the same relay when needed. A ready relay endpoint has both a registered circuit listener and a direct connection to the relay.
 
-## Continuous Peer Ping
+## Learned Addresses
 
-Run continuous ping on all active connections to a peer:
+```bash
+fungi conn addr-candidates
+fungi conn peer-addresses
+```
+
+These are advanced diagnostics for observed local addresses and device addresses learned by Fungi-owned state.
+
+## Ping
+
+Ping a saved device name:
+
+```bash
+fungi ping my-mac
+```
+
+Or ping by raw identity:
 
 ```bash
 fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-Set custom interval (milliseconds):
+Set an interval:
 
 ```bash
-fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --interval-ms 1000
-```
-
-Show detailed output:
-
-```bash
-fungi ping 16Uiu2HAmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX --verbose
+fungi ping my-mac --interval-ms 1000
 ```
 
 Stop with `Ctrl+C`.
 
-## Practical Troubleshooting Flow
+## Troubleshooting Flow
 
-1. Run `fungi conn overview` to confirm the peer has active connections.
-2. Run `fungi conn streams` to verify stream activity on expected protocols.
-3. Run `fungi ping <peer_id>` to monitor RTT and check for intermittent instability.
-4. If there are no active connections, verify allowed peers and relay/network settings in your config.
-
-## Related Docs
-
-- [Fungi CLI Guide](cli-service-quick-start)
-- [gRPC Guide](grpc-guide)
-- [Self-hosted Relay](self-hosted-relay)
+1. Run `fungi device list` to confirm the device name is saved.
+2. Run `fungi device trusted` on the target side to confirm trust.
+3. Run `fungi ping <device>` to test stream creation.
+4. Run `fungi conn relay-status --verbose` if the device needs relay fallback.
+5. Run `fungi conn overview --verbose` while opening `service@device` to see service streams.
