@@ -30,7 +30,7 @@ The site uses the official hosted GoatCounter service:
 
 - Dashboard: `https://fungi.goatcounter.com`
 - Pageview endpoint: `https://fungi.goatcounter.com/count`
-- Script: `https://gc.zgo.at/count.js`
+- Script: `https://gc.zgo.at/count.v5.js` (pinned with Subresource Integrity)
 
 GoatCounter filters localhost pageviews by default.
 

@@ -10,8 +10,11 @@ const config: Config = {
   favicon: "img/favicon.ico",
   scripts: [
     {
-      src: "https://gc.zgo.at/count.js",
+      src: "https://gc.zgo.at/count.v5.js",
       async: true,
+      crossorigin: "anonymous",
+      integrity:
+        "sha384-atnOLvQb9t+jTSipvd75X2yginT4PjVbqDdlJAmxMm+wYElFmeR6EmLP5bYeoRVQ",
       "data-goatcounter": "https://fungi.goatcounter.com/count",
       "data-goatcounter-settings": JSON.stringify({ no_onload: true }),
     },
@@ -35,7 +38,11 @@ const config: Config = {
   trailingSlash: false,
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "warn",
+    },
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -55,20 +62,7 @@ const config: Config = {
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/enbop/fungi-site/tree/master/",
         },
-        // blog: {
-        //   showReadingTime: true,
-        //   feedOptions: {
-        //     type: ["rss", "atom"],
-        //     xslt: true,
-        //   },
-        //   // Please change this to your repo.
-        //   // Remove this to remove the "edit this page" links.
-        //   editUrl: "https://github.com/enbop/fungi-site/tree/master/",
-        //   // Useful options to enforce blogging best practices
-        //   onInlineTags: "warn",
-        //   onInlineAuthors: "warn",
-        //   onUntruncatedBlogPosts: "warn",
-        // },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
