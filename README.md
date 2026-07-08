@@ -24,6 +24,16 @@ yarn build
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
+### Analytics
+
+The site uses the official hosted GoatCounter service:
+
+- Dashboard: `https://fungi.goatcounter.com`
+- Pageview endpoint: `https://fungi.goatcounter.com/count`
+- Script: `https://gc.zgo.at/count.js`
+
+GoatCounter filters localhost pageviews by default.
+
 ## Deployment
 
 Using SSH:

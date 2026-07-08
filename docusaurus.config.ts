@@ -8,6 +8,14 @@ const config: Config = {
   title: "Fungi",
   tagline: "Run apps on any device, and access them securely from anywhere.",
   favicon: "img/favicon.ico",
+  scripts: [
+    {
+      src: "https://gc.zgo.at/count.js",
+      async: true,
+      "data-goatcounter": "https://fungi.goatcounter.com/count",
+      "data-goatcounter-settings": JSON.stringify({ no_onload: true }),
+    },
+  ],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
