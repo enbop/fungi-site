@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
@@ -92,21 +92,53 @@ const bottomActions = [
   },
 ];
 
+const installCommand = "curl -fsSL https://fungi.rs/install.sh | sh";
+
+function fallbackCopyToClipboard(text: string) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   const [copied, setCopied] = useState(false);
+  const copyResetTimeoutRef = useRef<number | null>(null);
 
-  async function copyInstallCommand() {
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current !== null) {
+        window.clearTimeout(copyResetTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const copyInstallCommand = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(
-        "curl -fsSL https://fungi.rs/install.sh | sh",
-      );
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(installCommand);
+      } else {
+        fallbackCopyToClipboard(installCommand);
+      }
+
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      if (copyResetTimeoutRef.current !== null) {
+        window.clearTimeout(copyResetTimeoutRef.current);
+      }
+      copyResetTimeoutRef.current = window.setTimeout(() => {
+        setCopied(false);
+        copyResetTimeoutRef.current = null;
+      }, 1500);
     } catch {
       setCopied(false);
     }
-  }
+  }, []);
 
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
@@ -131,7 +163,7 @@ function HomepageHeader() {
               <p className={styles.installLabel}>macOS / Linux quick install</p>
               <div className={styles.installBar}>
                 <code className={styles.installCode}>
-                  curl -fsSL https://fungi.rs/install.sh | sh
+                  {installCommand}
                 </code>
                 <button
                   type="button"
